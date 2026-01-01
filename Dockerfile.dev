@@ -1,0 +1,33 @@
+# Development Dockerfile with hot reloading
+FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    UV_LINK_MODE=copy
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq-dev \
+    gcc \
+    nodejs \
+    npm \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+# Copy dependency files
+COPY pyproject.toml uv.lock ./
+
+# Install Python dependencies including dev
+RUN uv sync --frozen
+
+# Copy npm files and install
+COPY package*.json ./
+RUN npm ci
+
+EXPOSE 8000
+
+CMD ["uv", "run", "python", "manage.py", "runserver", "0.0.0.0:8000"]

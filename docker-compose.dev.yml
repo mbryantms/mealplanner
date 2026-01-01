@@ -1,0 +1,20 @@
+# Development override for docker-compose
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  db:
+    ports:
+      - "5432:5432"
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - .:/app
+      - /app/.venv
+      - /app/node_modules
+    environment:
+      - DEBUG=true
+      - SECRET_KEY=dev-secret-key-not-for-production
+    command: uv run python manage.py runserver 0.0.0.0:8000

@@ -1,0 +1,20 @@
+{
+  "name": "family-meal-planner",
+  "version": "0.1.0",
+  "description": "Frontend tooling for Family Meal Planner",
+  "private": true,
+  "scripts": {
+    "dev": "npm-run-all --parallel dev:*",
+    "dev:css": "npx tailwindcss -i ./static/css/input.css -o ./static/css/output.css --watch",
+    "build": "npm-run-all build:*",
+    "build:css": "npx tailwindcss -i ./static/css/input.css -o ./static/css/output.css --minify"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4",
+    "npm-run-all": "^4.1"
+  },
+  "dependencies": {
+    "htmx.org": "^2.0",
+    "alpinejs": "^3.14"
+  }
+}

@@ -1,0 +1,50 @@
+[project]
+name = "family-meal-planner"
+version = "0.1.0"
+description = "A web application for managing family meals, recipes, and shopping lists"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "django>=5.0,<6.0",
+    "psycopg[binary]>=3.1",
+    "django-environ>=0.11",
+    "pillow>=10.0",
+    "whitenoise>=6.6",
+    "gunicorn>=21.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "django-debug-toolbar>=4.2",
+    "pytest>=8.0",
+    "pytest-django>=4.7",
+    "ruff>=0.1",
+    "pre-commit>=3.6",
+]
+
+[dependency-groups]
+dev = [
+    "django-debug-toolbar>=4.2",
+    "pytest>=8.0",
+    "pytest-django>=4.7",
+    "ruff>=0.1",
+    "pre-commit>=3.6",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "DJ",  # flake8-django
+]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+python_files = ["test_*.py", "*_test.py"]
