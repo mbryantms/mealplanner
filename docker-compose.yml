@@ -1,6 +1,8 @@
 services:
   db:
     image: postgres:16-alpine
+    stdin_open: true
+    tty: true
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
@@ -19,6 +21,8 @@ services:
     build:
       context: .
       target: production
+    stdin_open: true
+    tty: true
     ports:
       - "8000:8000"
     environment:

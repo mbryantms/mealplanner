@@ -17,7 +17,7 @@ A web application for managing family meals, including recipe storage, ingredien
 ### Backend
 
 - **Framework:** Django 5.x (Python 3.12+)
-- **Database:** PostgreSQL 16
+- **Database:** PostgreSQL
 - **ORM:** Django ORM with normalized schema
 - **Authentication:** Django built-in auth (single household, shared login or individual accounts TBD)
 
