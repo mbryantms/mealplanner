@@ -1,0 +1,85 @@
+{% load planning_tags %}
+<div class="meal-slot p-2 h-full"
+     data-date="{{ date|date:'Y-m-d' }}"
+     data-meal-type="{{ meal_type }}">
+    {% if meal %}
+    <!-- Filled slot -->
+    <div class="group relative rounded-md p-2 cursor-grab active:cursor-grabbing
+                {% if meal_type == 'breakfast' %}bg-yellow-100 hover:bg-yellow-200
+                {% elif meal_type == 'lunch' %}bg-green-100 hover:bg-green-200
+                {% else %}bg-blue-100 hover:bg-blue-200{% endif %}"
+         draggable="true"
+         @dragstart="handleDragStart($event, '{{ meal.pk }}')"
+         @dragend="handleDragEnd($event)">
+
+        <div class="flex items-start justify-between gap-2">
+            <div class="flex-grow min-w-0">
+                {% if meal.recipe %}
+                <a href="{% url 'recipes:recipe_detail' meal.recipe.pk %}"
+                   class="font-medium text-sm text-gray-900 hover:text-blue-600 line-clamp-2 block">
+                    {{ meal.recipe.name }}
+                </a>
+                <div class="flex items-center gap-1 mt-0.5">
+                    {% if meal.recipe.makes_leftovers %}
+                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700" title="Makes leftovers{% if meal.recipe.leftover_days %} ({{ meal.recipe.leftover_days }} days){% endif %}">
+                        <svg class="w-3 h-3 mr-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                        </svg>
+                        Leftovers
+                    </span>
+                    {% endif %}
+                    {% if meal.servings_override %}
+                    <span class="text-xs text-gray-500">({{ meal.servings_override }} servings)</span>
+                    {% endif %}
+                </div>
+                {% else %}
+                <span class="font-medium text-sm text-gray-700 line-clamp-2 block">
+                    {{ meal.custom_meal }}
+                </span>
+                {% endif %}
+            </div>
+
+            <!-- Actions dropdown -->
+            <div class="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                 x-data="{ open: false }">
+                <button @click.stop="open = !open"
+                        class="p-1 rounded hover:bg-white/50">
+                    <svg class="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
+                    </svg>
+                </button>
+                <div x-show="open"
+                     @click.away="open = false"
+                     x-cloak
+                     class="absolute right-0 mt-1 w-32 bg-white rounded-md shadow-lg z-10 border border-gray-200">
+                    <button @click="openModal('{% url 'planning:meal_edit' meal.pk %}')"
+                            class="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        Edit
+                    </button>
+                    <button @click="openModal('{% url 'planning:meal_delete' meal.pk %}')"
+                            class="block w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-gray-100">
+                        Remove
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        {% if meal.notes %}
+        <p class="mt-1 text-xs text-gray-500 line-clamp-1">{{ meal.notes }}</p>
+        {% endif %}
+    </div>
+    {% else %}
+    <!-- Empty slot -->
+    <button @click="openModal('{% url 'planning:meal_add' %}?date={{ date|date:'Y-m-d' }}&meal_type={{ meal_type }}')"
+            class="w-full h-full min-h-16 flex items-center justify-center rounded-md border-2 border-dashed border-gray-200 hover:border-gray-400 hover:bg-gray-50 transition-colors">
+        <span class="text-gray-400 text-sm">
+            <svg class="w-5 h-5 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            {% if not mobile %}
+            <span class="sr-only">Add {{ meal_type }}</span>
+            {% endif %}
+        </span>
+    </button>
+    {% endif %}
+</div>

@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Meal Plan - Family Meal Planner{% endblock %}
+
+{% block extra_head %}
+<style>
+    [x-cloak] { display: none !important; }
+    .drag-over { background-color: rgb(219 234 254) !important; }
+    .dragging { opacity: 0.5; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6" x-data="mealPlanCalendar()">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h1 class="text-2xl font-bold text-gray-900">Meal Plan</h1>
+        <div class="flex items-center gap-2">
+            <a href="{% url 'planning:calendar_week' prev_week|date:'Y-m-d' %}"
+               hx-get="{% url 'planning:calendar_week' prev_week|date:'Y-m-d' %}"
+               hx-target="#calendar-container"
+               hx-push-url="true"
+               class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+                <span class="hidden sm:inline ml-1">Previous</span>
+            </a>
+            <a href="{% url 'planning:calendar' %}"
+               hx-get="{% url 'planning:calendar' %}"
+               hx-target="#calendar-container"
+               hx-push-url="true"
+               class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                Today
+            </a>
+            <a href="{% url 'planning:calendar_week' next_week|date:'Y-m-d' %}"
+               hx-get="{% url 'planning:calendar_week' next_week|date:'Y-m-d' %}"
+               hx-target="#calendar-container"
+               hx-push-url="true"
+               class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                <span class="hidden sm:inline mr-1">Next</span>
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </a>
+        </div>
+    </div>
+
+    <!-- Week Range -->
+    <div class="text-center">
+        <h2 class="text-lg font-medium text-gray-700">
+            {{ start_of_week|date:"F j" }} - {{ end_of_week|date:"F j, Y" }}
+        </h2>
+    </div>
+
+    <!-- Calendar Grid -->
+    <div id="calendar-container">
+        {% include "planning/partials/calendar_grid.html" %}
+    </div>
+
+    <!-- Meal Add/Edit Modal -->
+    <div x-show="showModal"
+         x-cloak
+         class="fixed inset-0 z-50 overflow-y-auto"
+         x-transition:enter="ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="closeModal()"></div>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+                 @click.away="closeModal()">
+                <div id="modal-content" class="p-6">
+                    <!-- Content loaded via HTMX -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function mealPlanCalendar() {
+    return {
+        showModal: false,
+        draggedMeal: null,
+
+        openModal(url) {
+            this.showModal = true;
+            htmx.ajax('GET', url, '#modal-content');
+        },
+
+        closeModal() {
+            this.showModal = false;
+            document.getElementById('modal-content').innerHTML = '';
+        },
+
+        handleDragStart(event, mealId) {
+            this.draggedMeal = mealId;
+            event.target.classList.add('dragging');
+            event.dataTransfer.effectAllowed = 'move';
+            event.dataTransfer.setData('text/plain', mealId);
+        },
+
+        handleDragEnd(event) {
+            event.target.classList.remove('dragging');
+            this.draggedMeal = null;
+            document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+        },
+
+        handleDragOver(event) {
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'move';
+        },
+
+        handleDragEnter(event) {
+            event.preventDefault();
+            event.currentTarget.classList.add('drag-over');
+        },
+
+        handleDragLeave(event) {
+            event.currentTarget.classList.remove('drag-over');
+        },
+
+        handleDrop(event, targetDate, targetMealType) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('drag-over');
+
+            const mealId = event.dataTransfer.getData('text/plain');
+            if (!mealId) return;
+
+            // Move the meal via HTMX
+            const formData = new FormData();
+            formData.append('new_date', targetDate);
+            formData.append('new_meal_type', targetMealType);
+
+            fetch(`/plan/meal/${mealId}/move/`, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+                }
+            }).then(response => {
+                if (response.ok) {
+                    // Refresh the calendar
+                    htmx.ajax('GET', window.location.pathname, '#calendar-container');
+                }
+            });
+        }
+    };
+}
+
+// Listen for HTMX events to close modal after successful form submission
+document.body.addEventListener('htmx:afterSwap', function(event) {
+    if (event.detail.target.id === 'modal-content' && event.detail.xhr.status === 200) {
+        // Check if the response indicates the modal should close (contains a meal slot)
+        if (event.detail.xhr.responseText.includes('meal-slot')) {
+            // This was a successful submission that returned a slot - don't close
+        }
+    }
+});
+
+// Close modal on successful meal operations
+document.body.addEventListener('mealUpdated', function() {
+    const calendar = document.querySelector('[x-data]').__x.$data;
+    if (calendar) {
+        calendar.closeModal();
+    }
+});
+</script>
+
+{% csrf_token %}
+{% endblock %}

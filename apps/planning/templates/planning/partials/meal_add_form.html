@@ -1,0 +1,120 @@
+<div class="space-y-4">
+    <div class="flex justify-between items-center">
+        <h3 class="text-lg font-medium text-gray-900">Add Meal</h3>
+        <button @click="closeModal()" class="text-gray-400 hover:text-gray-600">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+
+    <form method="post"
+          action="{% url 'planning:meal_add' %}"
+          hx-post="{% url 'planning:meal_add' %}"
+          hx-target="#slot-{{ date }}-{{ meal_type }}"
+          hx-swap="innerHTML"
+          @htmx:after-request="if(event.detail.successful && event.detail.xhr.status === 200) { closeModal(); htmx.ajax('GET', window.location.pathname, '#calendar-container'); }">
+        {% csrf_token %}
+
+        {{ form.date }}
+        {{ form.meal_type }}
+
+        <div class="space-y-4">
+            <!-- Recipe Search -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Recipe</label>
+                <div class="relative" x-data="{ search: '', showResults: false }">
+                    <input type="text"
+                           x-model="search"
+                           @focus="showResults = true"
+                           @input.debounce.300ms="$refs.results.innerHTML = ''; if(search.length > 0) htmx.ajax('GET', '{% url 'planning:recipe_search' %}?q=' + search, $refs.results)"
+                           placeholder="Search for a recipe..."
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+                    <div x-ref="results"
+                         x-show="showResults && search.length > 0"
+                         @click.away="showResults = false"
+                         class="absolute z-10 mt-1 w-full bg-white rounded-md shadow-lg border border-gray-200 max-h-60 overflow-auto">
+                        <!-- Results loaded via HTMX -->
+                    </div>
+                </div>
+
+                <!-- Selected recipe display -->
+                <div id="selected-recipe" class="mt-2 hidden">
+                    <div class="flex items-center justify-between bg-blue-50 rounded-md p-2">
+                        <span id="selected-recipe-name" class="text-sm font-medium text-blue-700"></span>
+                        <button type="button"
+                                onclick="clearRecipeSelection()"
+                                class="text-blue-400 hover:text-blue-600">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Hidden recipe field -->
+                <select name="recipe" id="recipe-select" class="hidden">
+                    <option value="">---------</option>
+                    {% for recipe in recipes %}
+                    <option value="{{ recipe.pk }}">{{ recipe.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Divider -->
+            <div class="relative">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-200"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-white text-gray-500">or</span>
+                </div>
+            </div>
+
+            <!-- Custom meal -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Custom Meal</label>
+                {{ form.custom_meal }}
+                <p class="mt-1 text-xs text-gray-500">e.g., Takeout, Leftovers, Eating out...</p>
+            </div>
+        </div>
+
+        <!-- Form errors -->
+        {% if form.errors %}
+        <div class="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
+            <p class="text-sm text-red-600">
+                {% for error in form.non_field_errors %}
+                {{ error }}
+                {% endfor %}
+            </p>
+        </div>
+        {% endif %}
+
+        <div class="mt-6 flex justify-end gap-3">
+            <button type="button"
+                    @click="closeModal()"
+                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                Cancel
+            </button>
+            <button type="submit"
+                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
+                Add Meal
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+function selectRecipe(id, name) {
+    document.getElementById('recipe-select').value = id;
+    document.getElementById('selected-recipe-name').textContent = name;
+    document.getElementById('selected-recipe').classList.remove('hidden');
+    document.querySelector('[name="custom_meal"]').value = '';
+}
+
+function clearRecipeSelection() {
+    document.getElementById('recipe-select').value = '';
+    document.getElementById('selected-recipe').classList.add('hidden');
+}
+</script>

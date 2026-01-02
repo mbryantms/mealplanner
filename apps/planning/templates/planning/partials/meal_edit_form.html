@@ -1,0 +1,81 @@
+<div class="space-y-4">
+    <div class="flex justify-between items-center">
+        <h3 class="text-lg font-medium text-gray-900">Edit Meal</h3>
+        <button @click="closeModal()" class="text-gray-400 hover:text-gray-600">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+
+    <form method="post"
+          action="{% url 'planning:meal_edit' meal.pk %}"
+          hx-post="{% url 'planning:meal_edit' meal.pk %}"
+          hx-target="#slot-{{ meal.date|date:'Y-m-d' }}-{{ meal.meal_type }}"
+          hx-swap="innerHTML"
+          @htmx:after-request="if(event.detail.successful && event.detail.xhr.status === 200) { closeModal(); htmx.ajax('GET', window.location.pathname, '#calendar-container'); }">
+        {% csrf_token %}
+
+        <div class="space-y-4">
+            <!-- Date -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                {{ form.date }}
+            </div>
+
+            <!-- Meal Type -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Meal</label>
+                {{ form.meal_type }}
+            </div>
+
+            <!-- Recipe -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Recipe</label>
+                {{ form.recipe }}
+            </div>
+
+            <!-- Custom meal -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Or Custom Meal</label>
+                {{ form.custom_meal }}
+            </div>
+
+            <!-- Servings override -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Servings Override</label>
+                {{ form.servings_override }}
+                <p class="mt-1 text-xs text-gray-500">Leave blank to use recipe default</p>
+            </div>
+
+            <!-- Notes -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                {{ form.notes }}
+            </div>
+        </div>
+
+        <!-- Form errors -->
+        {% if form.errors %}
+        <div class="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
+            <p class="text-sm text-red-600">
+                {% for error in form.non_field_errors %}
+                {{ error }}
+                {% endfor %}
+            </p>
+        </div>
+        {% endif %}
+
+        <div class="mt-6 flex justify-end gap-3">
+            <button type="button"
+                    @click="closeModal()"
+                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                Cancel
+            </button>
+            <button type="submit"
+                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
+                Save Changes
+            </button>
+        </div>
+    </form>
+</div>

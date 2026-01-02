@@ -1,0 +1,24 @@
+{% if recipes %}
+<ul class="py-1">
+    {% for recipe in recipes %}
+    <li>
+        <button type="button"
+                onclick="selectRecipe('{{ recipe.pk }}', '{{ recipe.name|escapejs }}')"
+                class="w-full text-left px-3 py-2 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none">
+            <div class="font-medium text-sm text-gray-900">{{ recipe.name }}</div>
+            {% if recipe.description %}
+            <div class="text-xs text-gray-500 line-clamp-1">{{ recipe.description }}</div>
+            {% endif %}
+        </button>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<div class="px-3 py-4 text-sm text-gray-500 text-center">
+    {% if query %}
+    No recipes found for "{{ query }}"
+    {% else %}
+    Start typing to search recipes
+    {% endif %}
+</div>
+{% endif %}
