@@ -9,8 +9,7 @@ from django.urls import include, path
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    # App URLs will be added here as features are implemented
-    # path("", include("apps.recipes.urls")),
+    path("recipes/", include("apps.recipes.urls")),
     # path("plan/", include("apps.planning.urls")),
     # path("shopping/", include("apps.shopping.urls")),
 ]

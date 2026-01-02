@@ -1,0 +1,22 @@
+{% if ingredients %}
+{% for ingredient in ingredients %}
+<button type="button"
+        @click="search = '{{ ingredient.name }}'; document.getElementById('ingredient-id').value = '{{ ingredient.pk }}'; showDropdown = false"
+        class="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 focus:bg-gray-100 focus:outline-none">
+    <span class="font-medium">{{ ingredient.name }}</span>
+    {% if ingredient.default_unit %}
+    <span class="text-gray-500 text-xs ml-1">({{ ingredient.default_unit }})</span>
+    {% endif %}
+</button>
+{% endfor %}
+{% else %}
+<div class="px-3 py-2 text-sm text-gray-500">
+    No ingredients found for "{{ query }}"
+    <button type="button"
+            hx-get="{% url 'recipes:ingredient_create_inline' %}?name={{ query }}"
+            hx-target="#new-ingredient-modal"
+            class="ml-2 text-blue-600 hover:text-blue-800">
+        Create new
+    </button>
+</div>
+{% endif %}

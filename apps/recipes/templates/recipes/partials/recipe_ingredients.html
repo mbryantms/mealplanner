@@ -1,0 +1,25 @@
+<p class="text-sm text-gray-500 mb-3">
+    For {{ scaled_servings }} serving{{ scaled_servings|pluralize }}
+</p>
+<ul class="space-y-2">
+    {% for item in scaled_ingredients %}
+    <li class="flex items-start">
+        <span class="inline-block w-4 h-4 mt-1 mr-2 border border-gray-300 rounded"></span>
+        <span class="{% if item.optional %}text-gray-500{% else %}text-gray-700{% endif %}">
+            {% if item.quantity %}
+                <strong>{{ item.quantity|floatformat:"-2" }}</strong>
+            {% endif %}
+            {% if item.unit %}{{ item.unit }}{% endif %}
+            {{ item.ingredient.name }}
+            {% if item.preparation %}
+                <span class="text-gray-500">({{ item.preparation }})</span>
+            {% endif %}
+            {% if item.optional %}
+                <span class="text-xs text-gray-400 ml-1">[optional]</span>
+            {% endif %}
+        </span>
+    </li>
+    {% empty %}
+    <li class="text-gray-500 italic">No ingredients added yet.</li>
+    {% endfor %}
+</ul>

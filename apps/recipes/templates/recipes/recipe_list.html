@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Recipes - Family Meal Planner{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h1 class="text-2xl font-bold text-gray-900">Recipes</h1>
+        <a href="{% url 'recipes:recipe_create' %}"
+           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Add Recipe
+        </a>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="bg-white p-4 rounded-lg shadow-sm">
+        <form method="get" class="flex flex-col sm:flex-row gap-4">
+            <div class="flex-grow">
+                <input type="text" name="q" value="{{ search_query }}"
+                       placeholder="Search recipes..."
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                       hx-get="{% url 'recipes:recipe_list' %}"
+                       hx-trigger="keyup changed delay:300ms"
+                       hx-target="#recipe-list"
+                       hx-push-url="true"
+                       hx-include="[name='category'], [name='tag']">
+            </div>
+            <div class="flex gap-2">
+                {{ form.category }}
+                {{ form.tag }}
+            </div>
+        </form>
+    </div>
+
+    <!-- Recipe List -->
+    <div id="recipe-list">
+        {% include "recipes/partials/recipe_list.html" %}
+    </div>
+</div>
+{% endblock %}
