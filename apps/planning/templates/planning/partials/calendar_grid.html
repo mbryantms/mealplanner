@@ -1,6 +1,6 @@
 {% load planning_tags %}
 <!-- Calendar Grid -->
-<div class="bg-white rounded-lg shadow overflow-hidden">
+<div class="bg-white rounded-lg shadow">
     <!-- Desktop view -->
     <div class="hidden md:block">
         <!-- Header row with days -->
@@ -27,8 +27,8 @@
                  @dragenter="handleDragEnter($event)"
                  @dragleave="handleDragLeave($event)"
                  @drop="handleDrop($event, '{{ day.date|date:'Y-m-d' }}', '{{ meal_type_value }}')">
-                {% with meal=day.meals|get_item:meal_type_value %}
-                {% include "planning/partials/meal_slot.html" with meal=meal date=day.date meal_type=meal_type_value %}
+                {% with meals=day.meals|get_item:meal_type_value %}
+                {% include "planning/partials/meal_slot.html" with meals=meals date=day.date meal_type=meal_type_value %}
                 {% endwith %}
             </div>
             {% endfor %}
@@ -50,8 +50,8 @@
                 <div class="px-4 py-3"
                      id="mobile-slot-{{ day.date|date:'Y-m-d' }}-{{ meal_type_value }}">
                     <div class="text-xs font-medium text-gray-500 uppercase mb-2">{{ meal_type_label }}</div>
-                    {% with meal=day.meals|get_item:meal_type_value %}
-                    {% include "planning/partials/meal_slot.html" with meal=meal date=day.date meal_type=meal_type_value mobile=True %}
+                    {% with meals=day.meals|get_item:meal_type_value %}
+                    {% include "planning/partials/meal_slot.html" with meals=meals date=day.date meal_type=meal_type_value mobile=True %}
                     {% endwith %}
                 </div>
                 {% endfor %}
@@ -76,3 +76,16 @@
         {% endfor %}
     </div>
 </div>
+
+{% if is_htmx %}
+<!-- OOB swaps for navigation and week range (HTMX only) -->
+<nav id="calendar-nav" class="flex items-center" hx-swap-oob="true" aria-label="Calendar navigation">
+    {% include "planning/partials/calendar_nav.html" %}
+</nav>
+
+<div id="week-range" class="text-center" hx-swap-oob="true">
+    <h2 class="text-lg font-medium text-gray-700">
+        {{ start_of_week|date:"F j" }} - {{ end_of_week|date:"F j, Y" }}
+    </h2>
+</div>
+{% endif %}

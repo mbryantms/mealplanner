@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Family Meal Planner{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header with Date Range Filter -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <div class="flex items-center gap-2">
+            <label for="days-filter" class="text-sm font-medium text-gray-700">Time Range:</label>
+            <select id="days-filter"
+                    name="days"
+                    class="block w-auto rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                    onchange="window.location.href='?days=' + this.value">
+                {% for option in days_options %}
+                <option value="{{ option }}" {% if option == days_filter %}selected{% endif %}>
+                    Last {{ option }} days
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <!-- Overview Cards -->
+    {% include "stats/partials/overview_cards.html" %}
+
+    <!-- Two Column Layout for Main Stats -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Recipe Usage -->
+        {% include "stats/partials/recipe_usage.html" with top_recipes=top_recipes max_recipe_usage=max_recipe_usage %}
+
+        <!-- Planning Coverage -->
+        {% include "stats/partials/planning_coverage.html" %}
+    </div>
+
+    <!-- Day of Week Chart -->
+    {% include "stats/partials/day_of_week.html" %}
+
+    <!-- Category Breakdowns (3 columns on large screens) -->
+    {% include "stats/partials/category_breakdown.html" %}
+
+    <!-- Ingredient Insights -->
+    {% include "stats/partials/ingredient_insights.html" %}
+
+    <!-- Trends Chart -->
+    {% include "stats/partials/trends_chart.html" %}
+</div>
+{% endblock %}

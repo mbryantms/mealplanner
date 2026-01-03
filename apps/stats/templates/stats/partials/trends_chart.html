@@ -1,0 +1,79 @@
+<!-- Trends Chart -->
+<div class="bg-white rounded-lg shadow-sm p-6">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4">Meal Planning Trends</h2>
+
+    {% if weekly_trends %}
+    <div class="h-64">
+        <canvas id="trends-chart"></canvas>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('trends-chart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [{% for trend in weekly_trends %}'{{ trend.week|date:"M d" }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+                datasets: [{
+                    label: 'Total Meals',
+                    data: [{% for trend in weekly_trends %}{{ trend.count }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                    borderColor: 'rgb(59, 130, 246)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                }, {
+                    label: 'Recipe Meals',
+                    data: [{% for trend in weekly_trends %}{{ trend.recipe_count }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                    borderColor: 'rgb(16, 185, 129)',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    intersect: false,
+                    mode: 'index',
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: function(context) {
+                                return 'Week of ' + context[0].label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    });
+    </script>
+    {% else %}
+    <div class="flex items-center justify-center h-64 text-gray-500">
+        <div class="text-center">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            <p class="mt-2">No trend data available yet.</p>
+            <p class="text-sm">Start planning meals to see trends over time.</p>
+        </div>
+    </div>
+    {% endif %}
+</div>

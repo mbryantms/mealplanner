@@ -1,4 +1,4 @@
-<div class="space-y-4">
+<div class="space-y-4" x-data="mealAddForm()">
     <div class="flex justify-between items-center">
         <h3 class="text-lg font-medium text-gray-900">Add Meal</h3>
         <button @click="closeModal()" class="text-gray-400 hover:text-gray-600">
@@ -20,12 +20,39 @@
         {{ form.meal_type }}
 
         <div class="space-y-4">
+            {% if suggested_recipes %}
+            <!-- Suggested/Common Recipes -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Quick Add</label>
+                <div class="flex flex-wrap gap-2">
+                    {% for recipe in suggested_recipes %}
+                    <button type="button"
+                            @click="selectRecipe('{{ recipe.pk }}', '{{ recipe.name|escapejs }}')"
+                            class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-full hover:bg-blue-100 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+                        {{ recipe.name }}
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Divider -->
+            <div class="relative">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-200"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-white text-gray-500">or search</span>
+                </div>
+            </div>
+            {% endif %}
+
             <!-- Recipe Search -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Recipe</label>
-                <div class="relative" x-data="{ search: '', showResults: false }">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Search All Recipes</label>
+                <div class="relative">
                     <input type="text"
                            x-model="search"
+                           x-ref="searchInput"
                            @focus="showResults = true"
                            @input.debounce.300ms="$refs.results.innerHTML = ''; if(search.length > 0) htmx.ajax('GET', '{% url 'planning:recipe_search' %}?q=' + search, $refs.results)"
                            placeholder="Search for a recipe..."
@@ -33,18 +60,18 @@
 
                     <div x-ref="results"
                          x-show="showResults && search.length > 0"
-                         @click.away="showResults = false"
+                         x-cloak
                          class="absolute z-10 mt-1 w-full bg-white rounded-md shadow-lg border border-gray-200 max-h-60 overflow-auto">
                         <!-- Results loaded via HTMX -->
                     </div>
                 </div>
 
                 <!-- Selected recipe display -->
-                <div id="selected-recipe" class="mt-2 hidden">
+                <div x-show="selectedRecipe" x-cloak class="mt-2">
                     <div class="flex items-center justify-between bg-blue-50 rounded-md p-2">
-                        <span id="selected-recipe-name" class="text-sm font-medium text-blue-700"></span>
+                        <span x-text="selectedRecipeName" class="text-sm font-medium text-blue-700"></span>
                         <button type="button"
-                                onclick="clearRecipeSelection()"
+                                @click="clearRecipeSelection()"
                                 class="text-blue-400 hover:text-blue-600">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -54,7 +81,7 @@
                 </div>
 
                 <!-- Hidden recipe field -->
-                <select name="recipe" id="recipe-select" class="hidden">
+                <select name="recipe" id="recipe-select" x-model="selectedRecipe" class="hidden">
                     <option value="">---------</option>
                     {% for recipe in recipes %}
                     <option value="{{ recipe.pk }}">{{ recipe.name }}</option>
@@ -94,11 +121,11 @@
         <div class="mt-6 flex justify-end gap-3">
             <button type="button"
                     @click="closeModal()"
-                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                 Cancel
             </button>
             <button type="submit"
-                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
+                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                 Add Meal
             </button>
         </div>
@@ -106,15 +133,28 @@
 </div>
 
 <script>
-function selectRecipe(id, name) {
-    document.getElementById('recipe-select').value = id;
-    document.getElementById('selected-recipe-name').textContent = name;
-    document.getElementById('selected-recipe').classList.remove('hidden');
-    document.querySelector('[name="custom_meal"]').value = '';
-}
+function mealAddForm() {
+    return {
+        search: '',
+        showResults: false,
+        selectedRecipe: '',
+        selectedRecipeName: '',
 
-function clearRecipeSelection() {
-    document.getElementById('recipe-select').value = '';
-    document.getElementById('selected-recipe').classList.add('hidden');
+        selectRecipe(id, name) {
+            this.selectedRecipe = id;
+            this.selectedRecipeName = name;
+            this.search = '';
+            this.showResults = false;
+            this.$refs.results.innerHTML = '';
+            // Clear custom meal when recipe is selected
+            const customMealInput = document.querySelector('[name="custom_meal"]');
+            if (customMealInput) customMealInput.value = '';
+        },
+
+        clearRecipeSelection() {
+            this.selectedRecipe = '';
+            this.selectedRecipeName = '';
+        }
+    };
 }
 </script>

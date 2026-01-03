@@ -36,11 +36,6 @@ class MealPlan(models.Model):
 
     class Meta:
         ordering = ["date", "meal_type"]
-        constraints = [
-            models.UniqueConstraint(
-                fields=["date", "meal_type"], name="unique_meal_per_slot"
-            )
-        ]
 
     def __str__(self):
         meal_name = self.recipe.name if self.recipe else self.custom_meal or "Empty"

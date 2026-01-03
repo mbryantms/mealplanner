@@ -1,0 +1,54 @@
+<!-- Planning Coverage -->
+<div class="bg-white rounded-lg shadow-sm p-6">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4">Planning Coverage</h2>
+    <p class="text-sm text-gray-500 mb-4">
+        {{ planning_coverage.start_date|date:"M d" }} - {{ planning_coverage.end_date|date:"M d, Y" }}
+    </p>
+
+    <div class="space-y-4">
+        <!-- Days Coverage -->
+        <div>
+            <div class="flex items-center justify-between mb-1">
+                <span class="text-sm text-gray-600">Days with meals</span>
+                <span class="text-sm font-medium text-gray-900">
+                    {{ planning_coverage.days_with_meals }} / {{ planning_coverage.total_days }} days
+                </span>
+            </div>
+            <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div class="h-full bg-green-500 rounded-full transition-all duration-500"
+                     style="width: {{ planning_coverage.coverage_percent }}%"></div>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">{{ planning_coverage.coverage_percent }}% coverage</p>
+        </div>
+
+        <!-- Meal Slots -->
+        <div>
+            <div class="flex items-center justify-between mb-1">
+                <span class="text-sm text-gray-600">Meal slots filled</span>
+                <span class="text-sm font-medium text-gray-900">
+                    {{ planning_coverage.planned_meals }} / {{ planning_coverage.total_slots }} slots
+                </span>
+            </div>
+            <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div class="h-full bg-blue-500 rounded-full transition-all duration-500"
+                     style="width: {{ planning_coverage.slot_coverage_percent }}%"></div>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">{{ planning_coverage.slot_coverage_percent }}% of all breakfast, lunch, and dinner slots</p>
+        </div>
+    </div>
+
+    <!-- Meal Type Breakdown -->
+    {% if meal_type_breakdown %}
+    <div class="mt-6 pt-4 border-t border-gray-200">
+        <h3 class="text-sm font-medium text-gray-700 mb-3">By Meal Type</h3>
+        <div class="grid grid-cols-3 gap-4 text-center">
+            {% for meal in meal_type_breakdown %}
+            <div>
+                <p class="text-2xl font-bold text-gray-900">{{ meal.count }}</p>
+                <p class="text-xs text-gray-500">{{ meal.name }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>

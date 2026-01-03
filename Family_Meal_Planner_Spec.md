@@ -48,7 +48,8 @@ A canonical list of ingredients used across all recipes.
 
 - **id:** Primary key (UUID or auto-increment)
 - **name:** Ingredient name (e.g., "Chicken Breast", "Olive Oil")
-- **category:** FK to IngredientCategory (Produce, Dairy, Meat, Pantry, etc.)
+- **category:** FK to IngredientCategory (Produce, Dairy, Meat, Pan
+- try, etc.)
 - **default_unit:** Default measurement unit (oz, lb, cups, etc.)
 - **notes:** Optional notes (e.g., "boneless skinless preferred")
 

@@ -1,0 +1,29 @@
+<a href="{% url 'planning:calendar_week' prev_week|date:'Y-m-d' %}"
+   hx-get="{% url 'planning:calendar_week' prev_week|date:'Y-m-d' %}"
+   hx-target="#calendar-container"
+   hx-push-url="true"
+   class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-l-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+   aria-label="Previous week">
+    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+    </svg>
+    <span class="hidden sm:inline ml-1">Prev</span>
+</a>
+<a href="{% url 'planning:calendar' %}"
+   hx-get="{% url 'planning:calendar' %}"
+   hx-target="#calendar-container"
+   hx-push-url="true"
+   class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-l-0 border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 -ml-px">
+    Today
+</a>
+<a href="{% url 'planning:calendar_week' next_week|date:'Y-m-d' %}"
+   hx-get="{% url 'planning:calendar_week' next_week|date:'Y-m-d' %}"
+   hx-target="#calendar-container"
+   hx-push-url="true"
+   class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-l-0 border-gray-300 rounded-r-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 -ml-px"
+   aria-label="Next week">
+    <span class="hidden sm:inline mr-1">Next</span>
+    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+    </svg>
+</a>

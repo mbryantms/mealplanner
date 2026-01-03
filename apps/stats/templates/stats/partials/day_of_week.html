@@ -1,0 +1,90 @@
+<!-- Day of Week Stats -->
+<div class="bg-white rounded-lg shadow-sm p-6">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4">Meals by Day of Week</h2>
+
+    <div class="h-64">
+        <canvas id="day-of-week-chart"></canvas>
+    </div>
+
+    <!-- Weekend vs Weekday Comparison -->
+    <div class="mt-6 pt-4 border-t border-gray-200">
+        <div class="flex justify-around items-center">
+            <div class="text-center">
+                <p class="text-3xl font-bold text-gray-900">{{ weekend_vs_weekday.weekday }}</p>
+                <p class="text-sm text-gray-500">Weekday Meals</p>
+            </div>
+            <div class="text-gray-300 text-2xl">vs</div>
+            <div class="text-center">
+                <p class="text-3xl font-bold text-gray-900">{{ weekend_vs_weekday.weekend }}</p>
+                <p class="text-sm text-gray-500">Weekend Meals</p>
+            </div>
+        </div>
+    </div>
+
+    {% if popular_weekend_recipes %}
+    <div class="mt-4 pt-4 border-t border-gray-200">
+        <h3 class="text-sm font-medium text-gray-700 mb-2">Popular Weekend Recipes</h3>
+        <div class="flex flex-wrap gap-2">
+            {% for recipe in popular_weekend_recipes %}
+            <a href="{% url 'recipes:recipe_detail' recipe.pk %}"
+               class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700 hover:bg-purple-200">
+                {{ recipe.name }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('day-of-week-chart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [{% for stat in day_of_week_stats %}'{{ stat.day }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Meals',
+                data: [{% for stat in day_of_week_stats %}{{ stat.count }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                backgroundColor: [
+                    'rgba(139, 92, 246, 0.7)',  // Sunday - purple
+                    'rgba(59, 130, 246, 0.7)',   // Monday - blue
+                    'rgba(59, 130, 246, 0.7)',   // Tuesday - blue
+                    'rgba(59, 130, 246, 0.7)',   // Wednesday - blue
+                    'rgba(59, 130, 246, 0.7)',   // Thursday - blue
+                    'rgba(59, 130, 246, 0.7)',   // Friday - blue
+                    'rgba(139, 92, 246, 0.7)',  // Saturday - purple
+                ],
+                borderColor: [
+                    'rgb(139, 92, 246)',
+                    'rgb(59, 130, 246)',
+                    'rgb(59, 130, 246)',
+                    'rgb(59, 130, 246)',
+                    'rgb(59, 130, 246)',
+                    'rgb(59, 130, 246)',
+                    'rgb(139, 92, 246)',
+                ],
+                borderWidth: 1,
+                borderRadius: 4,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+});
+</script>

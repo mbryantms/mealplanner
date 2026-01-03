@@ -36,158 +36,158 @@
 ## Phase 1: Data Models
 
 ### Ingredient System
-- [ ] Create `IngredientCategory` model (name, sort_order)
-- [ ] Create `Ingredient` model (name, category FK, default_unit, notes)
-- [ ] Create admin interface for IngredientCategory
-- [ ] Create admin interface for Ingredient
-- [ ] Add database migration
+- [x] Create `IngredientCategory` model (name, sort_order)
+- [x] Create `Ingredient` model (name, category FK, default_unit, notes)
+- [x] Create admin interface for IngredientCategory
+- [x] Create admin interface for Ingredient
+- [x] Add database migration
 
 ### Recipe System
-- [ ] Create `Category` model (name, parent self-FK for hierarchy)
-- [ ] Create `Tag` model (name, slug)
-- [ ] Create `Recipe` model (all fields from spec)
-- [ ] Create `RecipeIngredient` junction model
-- [ ] Create Recipe-Tag many-to-many relationship
-- [ ] Create admin interfaces for all recipe models
-- [ ] Add database migrations
+- [x] Create `Category` model (name, parent self-FK for hierarchy)
+- [x] Create `Tag` model (name, slug)
+- [x] Create `Recipe` model (all fields from spec)
+- [x] Create `RecipeIngredient` junction model
+- [x] Create Recipe-Tag many-to-many relationship
+- [x] Create admin interfaces for all recipe models
+- [x] Add database migrations
 
 ### Meal Planning System
-- [ ] Create `MealType` enum (BREAKFAST, LUNCH, DINNER)
-- [ ] Create `MealPlan` model (date, meal_type, recipe FK, custom_meal, servings_override, notes)
-- [ ] Create admin interface for MealPlan
-- [ ] Add database migration
+- [x] Create `MealType` enum (BREAKFAST, LUNCH, DINNER)
+- [x] Create `MealPlan` model (date, meal_type, recipe FK, custom_meal, servings_override, notes)
+- [x] Create admin interface for MealPlan
+- [x] Add database migration
 
 ### Shopping List System
-- [ ] Create `ShoppingList` model (name, created_at, date_range)
-- [ ] Create `ShoppingListItem` model (shopping_list FK, ingredient FK, custom_item, quantity, unit, checked)
-- [ ] Create admin interfaces for shopping list models
-- [ ] Add database migration
+- [x] Create `ShoppingList` model (name, created_at, date_range)
+- [x] Create `ShoppingListItem` model (shopping_list FK, ingredient FK, custom_item, quantity, unit, checked)
+- [x] Create admin interfaces for shopping list models
+- [x] Add database migration
 
 ---
 
 ## Phase 2: Recipe Management
 
 ### Recipe CRUD
-- [ ] Create recipe list view (with pagination)
-- [ ] Create recipe detail view
-- [ ] Create recipe create form
-- [ ] Create recipe edit form
-- [ ] Create recipe delete functionality
-- [ ] Add URL routing for all recipe views
+- [x] Create recipe list view (with pagination)
+- [x] Create recipe detail view
+- [x] Create recipe create form
+- [x] Create recipe edit form
+- [x] Create recipe delete functionality
+- [x] Add URL routing for all recipe views
 
 ### Recipe Ingredients
-- [ ] Create ingredient autocomplete endpoint (HTMX)
-- [ ] Create inline ingredient add form
-- [ ] Create on-the-fly ingredient creation modal/form
-- [ ] Implement ingredient quantity/unit input
-- [ ] Implement optional ingredient toggle
-- [ ] Implement preparation notes field
+- [x] Create ingredient autocomplete endpoint (HTMX)
+- [x] Create inline ingredient add form
+- [x] Create on-the-fly ingredient creation modal/form
+- [x] Implement ingredient quantity/unit input
+- [x] Implement optional ingredient toggle
+- [x] Implement preparation notes field
 
 ### Recipe Organization
-- [ ] Create category assignment UI
-- [ ] Create tag assignment UI (multi-select)
+- [x] Create category assignment UI
+- [x] Create tag assignment UI (multi-select)
 - [ ] Create new category inline creation
 - [ ] Create new tag inline creation
 
 ### Recipe Search & Filter
-- [ ] Implement search by recipe name
-- [ ] Implement filter by category
-- [ ] Implement filter by tag
+- [x] Implement search by recipe name
+- [x] Implement filter by category
+- [x] Implement filter by tag
 - [ ] Implement filter by ingredient
-- [ ] Create combined search/filter UI
-- [ ] Add HTMX live search functionality
+- [x] Create combined search/filter UI
+- [x] Add HTMX live search functionality
 
 ### Recipe Scaling
-- [ ] Implement serving size adjustment UI
-- [ ] Calculate scaled ingredient quantities
-- [ ] Display scaled quantities in recipe view
+- [x] Implement serving size adjustment UI
+- [x] Calculate scaled ingredient quantities
+- [x] Display scaled quantities in recipe view
 
 ### Recipe Image (decision pending)
-- [ ] Implement image upload field
-- [ ] Configure media file storage
-- [ ] Display recipe images in list/detail views
-- [ ] Add image placeholder for recipes without images
+- [x] Implement image upload field
+- [x] Configure media file storage
+- [x] Display recipe images in list/detail views
+- [x] Add image placeholder for recipes without images
 
 ---
 
 ## Phase 3: Meal Planning
 
 ### Weekly Calendar View
-- [ ] Create week view template (Sunday-Saturday, 7-day grid)
-- [ ] Display current week by default
-- [ ] Show all 3 meal slots per day (Breakfast, Lunch, Dinner)
-- [ ] Display assigned recipes in slots
-- [ ] Display custom meals in slots
+- [x] Create week view template (Sunday-Saturday, 7-day grid)
+- [x] Display current week by default
+- [x] Show all 3 meal slots per day (Breakfast, Lunch, Dinner)
+- [x] Display assigned recipes in slots
+- [x] Display custom meals in slots
 
 ### Week Navigation
-- [ ] Add previous/next week buttons
-- [ ] Add "today" button to return to current week
-- [ ] Implement week navigation via HTMX
-- [ ] Display week date range in header
+- [x] Add previous/next week buttons
+- [x] Add "today" button to return to current week
+- [x] Implement week navigation via HTMX
+- [x] Display week date range in header
 
 ### Meal Assignment
-- [ ] Create recipe picker/search for assignment
-- [ ] Implement assign recipe to date/meal_type
-- [ ] Create quick "Leftovers" option
-- [ ] Create quick "Takeout" option
-- [ ] Implement custom meal text entry
-- [ ] Add servings override option
-- [ ] Add notes field for meal instance
+- [x] Create recipe picker/search for assignment
+- [x] Implement assign recipe to date/meal_type
+- [x] Create quick "Leftovers" option
+- [x] Create quick "Takeout" option
+- [x] Implement custom meal text entry
+- [x] Add servings override option
+- [x] Add notes field for meal instance
 
 ### Drag-and-Drop
-- [ ] Implement drag-and-drop library integration
-- [ ] Make meals draggable between slots
-- [ ] Make meals draggable between days
-- [ ] Handle drop validation and persistence
+- [x] Implement drag-and-drop library integration
+- [x] Make meals draggable between slots
+- [x] Make meals draggable between days
+- [x] Handle drop validation and persistence
 - [ ] Implement copy on drag with modifier key (optional)
 
 ### Meal Management
-- [ ] Implement remove meal from slot
+- [x] Implement remove meal from slot
 - [ ] Implement copy meal to another day
 
 ### Visual Indicators
-- [ ] Show leftover-friendly meal indicator
-- [ ] Show recipe image thumbnails (if available)
-- [ ] Differentiate recipe vs custom meal styling
+- [x] Show leftover-friendly meal indicator
+- [x] Show recipe image thumbnails (if available)
+- [x] Differentiate recipe vs custom meal styling
 
 ---
 
 ## Phase 4: Shopping Lists
 
 ### List Generation
-- [ ] Create date range picker UI
-- [ ] Implement "Generate from meal plan" function
-- [ ] Aggregate ingredients across selected meals
-- [ ] Handle duplicate ingredient combination (same units only for MVP)
-- [ ] Group items by ingredient category
-- [ ] Sort categories by sort_order
+- [x] Create date range picker UI
+- [x] Implement "Generate from meal plan" function
+- [x] Aggregate ingredients across selected meals
+- [x] Handle duplicate ingredient combination (same units only for MVP)
+- [x] Group items by ingredient category
+- [x] Sort categories by sort_order
 
 ### List Display
-- [ ] Create shopping list view
-- [ ] Display items grouped by category
-- [ ] Show quantity and unit for each item
-- [ ] Display category headers/sections
+- [x] Create shopping list view
+- [x] Display items grouped by category
+- [x] Show quantity and unit for each item
+- [x] Display category headers/sections
 
 ### Item Check-off
-- [ ] Implement checkbox for each item
-- [ ] Persist checked state via HTMX
-- [ ] Visual styling for checked items
+- [x] Implement checkbox for each item
+- [x] Persist checked state via HTMX
+- [x] Visual styling for checked items
 - [ ] Option to hide/show checked items
 
 ### Custom Items
-- [ ] Create "Add custom item" form
+- [x] Create "Add custom item" form
 - [ ] Allow assigning custom items to categories
-- [ ] Display custom items in appropriate sections
+- [x] Display custom items in appropriate sections
 
 ### List Management
-- [ ] Create shopping list index (list of lists)
-- [ ] Implement list rename
-- [ ] Implement list delete
+- [x] Create shopping list index (list of lists)
+- [x] Implement list rename
+- [x] Implement list delete
 - [ ] Implement list duplicate/copy
 
 ### Mobile Optimization
-- [ ] Optimize touch targets for check-off
-- [ ] Ensure readable font sizes on mobile
+- [x] Optimize touch targets for check-off
+- [x] Ensure readable font sizes on mobile
 - [ ] Test category collapse/expand on mobile
 - [ ] Minimize data usage for in-store use
 
@@ -196,33 +196,33 @@
 ## Phase 5: User Interface
 
 ### Base Layout
-- [ ] Create responsive base template
-- [ ] Implement main navigation (Recipes, Plan, Shopping List)
-- [ ] Add mobile hamburger menu
-- [ ] Create consistent header/footer
+- [x] Create responsive base template
+- [x] Implement main navigation (Recipes, Plan, Shopping List)
+- [x] Add mobile hamburger menu
+- [x] Create consistent header/footer
 
 ### HTMX Integration
-- [ ] Configure HTMX for all dynamic interactions
-- [ ] Create partial templates for HTMX responses
-- [ ] Implement loading indicators
-- [ ] Handle HTMX errors gracefully
+- [x] Configure HTMX for all dynamic interactions
+- [x] Create partial templates for HTMX responses
+- [x] Implement loading indicators
+- [x] Handle HTMX errors gracefully
 
 ### Alpine.js Components
-- [ ] Implement dropdown menus
-- [ ] Implement modal dialogs
-- [ ] Implement form validation feedback
-- [ ] Implement toast notifications
+- [x] Implement dropdown menus
+- [x] Implement modal dialogs
+- [x] Implement form validation feedback
+- [x] Implement toast notifications
 
 ### Tailwind Styling
-- [ ] Define color palette/theme
-- [ ] Create consistent button styles
-- [ ] Create consistent form input styles
-- [ ] Create consistent card/container styles
+- [x] Define color palette/theme
+- [x] Create consistent button styles
+- [x] Create consistent form input styles
+- [x] Create consistent card/container styles
 
 ### Responsive Design
-- [ ] Test and fix mobile layouts
-- [ ] Test and fix tablet layouts
-- [ ] Ensure touch-friendly interactions
+- [x] Test and fix mobile layouts
+- [x] Test and fix tablet layouts
+- [x] Ensure touch-friendly interactions
 - [ ] Test on actual mobile devices
 
 ---
@@ -230,23 +230,23 @@
 ## Phase 6: Authentication
 
 ### User System
-- [ ] Configure Django auth settings
-- [ ] Create custom User model (or extend) with role field
-- [ ] Define Admin and User roles/permissions
-- [ ] Create login page
-- [ ] Create logout functionality
-- [ ] Protect all views with login_required
+- [x] Configure Django auth settings
+- [x] Create custom User model (or extend) with role field
+- [x] Define Admin and User roles/permissions
+- [x] Create login page
+- [x] Create logout functionality
+- [x] Protect all views with login_required
 
 ### User Management
-- [ ] Create user registration (admin-only creation for MVP)
-- [ ] Create user profile page
-- [ ] Implement password change
-- [ ] Implement password reset (email-based)
+- [x] Create user registration (admin-only creation for MVP)
+- [x] Create user profile page
+- [x] Implement password change
+- [x] Implement password reset (email-based)
 
 ### Permissions
-- [ ] Implement admin-only views (user management, etc.)
-- [ ] Ensure general users can CRUD recipes, meals, lists
-- [ ] Test permission boundaries
+- [x] Implement admin-only views (user management, etc.)
+- [x] Ensure general users can CRUD recipes, meals, lists
+- [x] Test permission boundaries
 
 ---
 
@@ -330,11 +330,11 @@ Items explicitly deferred from MVP:
 
 MVP is complete when:
 - [x] All Phase 0 decisions are made
-- [ ] All data models are implemented and migrated
-- [ ] Recipe CRUD with ingredients works fully
-- [ ] Weekly meal planning calendar with drag-and-drop works
-- [ ] Shopping list generation and check-off works
-- [ ] Mobile-responsive UI is functional
-- [ ] Authentication with admin/user roles works
-- [ ] Password reset mechanism works
+- [x] All data models are implemented and migrated
+- [x] Recipe CRUD with ingredients works fully
+- [x] Weekly meal planning calendar with drag-and-drop works
+- [x] Shopping list generation and check-off works
+- [x] Mobile-responsive UI is functional
+- [x] Authentication with admin/user roles works
+- [x] Password reset mechanism works
 - [ ] Application is deployed on Proxmox and accessible via IP

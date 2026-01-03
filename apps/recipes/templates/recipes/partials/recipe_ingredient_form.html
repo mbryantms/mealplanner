@@ -1,9 +1,24 @@
+<div id="ingredient-form-wrapper"{% if show_errors %} hx-swap-oob="true"{% endif %}>
 <form hx-post="{% url 'recipes:recipe_ingredient_add' recipe.pk %}"
       hx-target="#ingredients-container"
       hx-swap="beforeend"
-      hx-on::after-request="if(event.detail.successful) this.reset()"
+      hx-on::after-request="if(event.detail.successful) { this.reset(); document.getElementById('ingredient-id').value = ''; document.getElementById('ingredient-unit').value = ''; }"
       class="bg-gray-50 p-4 rounded-md">
     {% csrf_token %}
+
+    {% if form.errors %}
+    <div class="mb-3 p-3 bg-red-50 border border-red-200 rounded-md">
+        <p class="text-sm text-red-600">
+            {% for field, errors in form.errors.items %}
+                {% if field == '__all__' %}
+                    {{ errors.0 }}
+                {% else %}
+                    {{ field|title }}: {{ errors.0 }}
+                {% endif %}
+            {% endfor %}
+        </p>
+    </div>
+    {% endif %}
 
     <div class="grid grid-cols-1 sm:grid-cols-6 gap-3">
         <!-- Ingredient Search/Select -->
@@ -12,7 +27,7 @@
             <div class="relative">
                 <input type="text"
                        x-model="search"
-                       @input.debounce.300ms="if(search.length >= 2) { fetch('{% url 'recipes:ingredient_autocomplete' %}?q=' + search).then(r => r.text()).then(html => { $refs.dropdown.innerHTML = html; showDropdown = true; }) }"
+                       @input.debounce.300ms="if(search.length >= 2) { fetch('{% url 'recipes:ingredient_autocomplete' %}?q=' + search).then(r => r.text()).then(html => { $refs.dropdown.innerHTML = html; htmx.process($refs.dropdown); showDropdown = true; }) }"
                        @focus="if(ingredients.length) showDropdown = true"
                        @click.outside="showDropdown = false"
                        placeholder="Search ingredients..."
@@ -22,6 +37,12 @@
                 </div>
             </div>
             <input type="hidden" name="ingredient" id="ingredient-id">
+            <button type="button"
+                    hx-get="{% url 'recipes:ingredient_create_inline' %}"
+                    hx-target="#new-ingredient-modal"
+                    class="mt-1 text-xs text-blue-600 hover:text-blue-800 hover:underline">
+                + Create new ingredient
+            </button>
         </div>
 
         <!-- Quantity -->
@@ -31,11 +52,12 @@
                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
         </div>
 
-        <!-- Unit -->
+        <!-- Unit (auto-populated from ingredient) -->
         <div>
             <label class="block text-xs font-medium text-gray-600 mb-1">Unit</label>
-            <input type="text" name="unit" placeholder="oz, cups..."
-                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+            <input type="text" name="unit" id="ingredient-unit" readonly
+                   placeholder="select ingredient"
+                   class="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-sm text-gray-700 cursor-not-allowed">
         </div>
 
         <!-- Preparation -->
@@ -52,9 +74,10 @@
                 Optional
             </label>
             <button type="submit"
-                    class="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
+                    class="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                 Add
             </button>
         </div>
     </div>
 </form>
+</div>

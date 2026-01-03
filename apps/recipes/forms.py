@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import inlineformset_factory
 
-from .models import Category, Ingredient, IngredientCategory, Recipe, RecipeIngredient, Tag
+from .models import Cuisine, DishType, Ingredient, IngredientCategory, Protein, Recipe, RecipeIngredient, Tag
 
 
 class RecipeForm(forms.ModelForm):
@@ -18,7 +18,9 @@ class RecipeForm(forms.ModelForm):
             "servings",
             "makes_leftovers",
             "leftover_days",
-            "category",
+            "cuisines",
+            "proteins",
+            "dish_types",
             "tags",
             "source_url",
             "image",
@@ -74,13 +76,17 @@ class RecipeForm(forms.ModelForm):
                     "min": 1,
                 }
             ),
-            "category": forms.Select(
-                attrs={
-                    "class": "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
-                }
+            "cuisines": forms.CheckboxSelectMultiple(
+                attrs={"class": "space-y-1"}
+            ),
+            "proteins": forms.CheckboxSelectMultiple(
+                attrs={"class": "space-y-1"}
+            ),
+            "dish_types": forms.CheckboxSelectMultiple(
+                attrs={"class": "space-y-1"}
             ),
             "tags": forms.CheckboxSelectMultiple(
-                attrs={"class": "space-y-2"}
+                attrs={"class": "space-y-1"}
             ),
             "source_url": forms.URLInput(
                 attrs={
@@ -101,7 +107,7 @@ class RecipeIngredientForm(forms.ModelForm):
 
     class Meta:
         model = RecipeIngredient
-        fields = ["ingredient", "quantity", "unit", "preparation", "optional", "order"]
+        fields = ["ingredient", "quantity", "unit", "preparation", "optional"]
         widgets = {
             "ingredient": forms.Select(
                 attrs={
@@ -131,7 +137,6 @@ class RecipeIngredientForm(forms.ModelForm):
             "optional": forms.CheckboxInput(
                 attrs={"class": "h-4 w-4 text-blue-600 rounded"}
             ),
-            "order": forms.HiddenInput(),
         }
 
 
@@ -171,27 +176,6 @@ class IngredientQuickForm(forms.ModelForm):
         }
 
 
-class CategoryQuickForm(forms.ModelForm):
-    """Quick form for creating categories inline."""
-
-    class Meta:
-        model = Category
-        fields = ["name", "parent"]
-        widgets = {
-            "name": forms.TextInput(
-                attrs={
-                    "class": "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
-                    "placeholder": "Category name",
-                }
-            ),
-            "parent": forms.Select(
-                attrs={
-                    "class": "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
-                }
-            ),
-        }
-
-
 class TagQuickForm(forms.ModelForm):
     """Quick form for creating tags inline."""
 
@@ -206,6 +190,53 @@ class TagQuickForm(forms.ModelForm):
                 }
             ),
         }
+
+
+class RecipeURLImportForm(forms.Form):
+    """Form for importing recipe from URL."""
+
+    url = forms.URLField(
+        widget=forms.URLInput(
+            attrs={
+                "class": "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
+                "placeholder": "https://www.allrecipes.com/recipe/...",
+            }
+        ),
+        help_text="Enter a URL from a supported recipe website",
+    )
+
+
+class RecipeTextImportForm(forms.Form):
+    """Form for importing recipe from pasted text."""
+
+    recipe_text = forms.CharField(
+        widget=forms.Textarea(
+            attrs={
+                "class": "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
+                "rows": 15,
+                "placeholder": """Paste your recipe here...
+
+Example format:
+
+Chicken Stir Fry
+
+Prep time: 15 minutes
+Cook time: 20 minutes
+Serves: 4
+
+Ingredients:
+- 2 lbs chicken breast, cubed
+- 1 tbsp olive oil
+- 2 cloves garlic, minced
+...
+
+Instructions:
+1. Heat oil in a large pan over medium-high heat.
+2. Add chicken and cook until browned...
+""",
+            }
+        ),
+    )
 
 
 class RecipeSearchForm(forms.Form):
@@ -224,33 +255,31 @@ class RecipeSearchForm(forms.Form):
             }
         ),
     )
-    category = forms.ModelChoiceField(
-        queryset=Category.objects.all(),
+    cuisines = forms.ModelMultipleChoiceField(
+        queryset=Cuisine.objects.all(),
         required=False,
-        empty_label="All Categories",
-        widget=forms.Select(
-            attrs={
-                "class": "px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
-                "hx-get": "",
-                "hx-trigger": "change",
-                "hx-target": "#recipe-list",
-                "hx-include": "[name='q'], [name='tag']",
-                "hx-push-url": "true",
-            }
+        widget=forms.CheckboxSelectMultiple(
+            attrs={"class": "filter-checkbox"}
         ),
     )
-    tag = forms.ModelChoiceField(
+    proteins = forms.ModelMultipleChoiceField(
+        queryset=Protein.objects.all(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple(
+            attrs={"class": "filter-checkbox"}
+        ),
+    )
+    dish_types = forms.ModelMultipleChoiceField(
+        queryset=DishType.objects.all(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple(
+            attrs={"class": "filter-checkbox"}
+        ),
+    )
+    tags = forms.ModelMultipleChoiceField(
         queryset=Tag.objects.all(),
         required=False,
-        empty_label="All Tags",
-        widget=forms.Select(
-            attrs={
-                "class": "px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
-                "hx-get": "",
-                "hx-trigger": "change",
-                "hx-target": "#recipe-list",
-                "hx-include": "[name='q'], [name='category']",
-                "hx-push-url": "true",
-            }
+        widget=forms.CheckboxSelectMultiple(
+            attrs={"class": "filter-checkbox"}
         ),
     )

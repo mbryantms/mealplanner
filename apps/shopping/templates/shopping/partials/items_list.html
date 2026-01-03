@@ -1,0 +1,51 @@
+{% if all_items %}
+<!-- Alphabetical List -->
+<div class="bg-white rounded-lg shadow-sm overflow-hidden">
+    <div class="bg-gray-50 px-4 py-2 border-b border-gray-200">
+        <h2 class="font-medium text-gray-700">All Items (A-Z)</h2>
+    </div>
+    <ul class="divide-y divide-gray-100">
+        {% for item in all_items %}
+        {% include "shopping/partials/item_row.html" %}
+        {% endfor %}
+    </ul>
+</div>
+{% else %}
+<!-- Grouped by Category -->
+{% for category, items in categorized_items %}
+<div class="bg-white rounded-lg shadow-sm overflow-hidden">
+    <div class="bg-gray-50 px-4 py-2 border-b border-gray-200">
+        <h2 class="font-medium text-gray-700">{{ category.name }}</h2>
+    </div>
+    <ul class="divide-y divide-gray-100">
+        {% for item in items %}
+        {% include "shopping/partials/item_row.html" %}
+        {% endfor %}
+    </ul>
+</div>
+{% endfor %}
+
+{% if uncategorized %}
+<div class="bg-white rounded-lg shadow-sm overflow-hidden">
+    <div class="bg-gray-50 px-4 py-2 border-b border-gray-200">
+        <h2 class="font-medium text-gray-700">Other Items</h2>
+    </div>
+    <ul class="divide-y divide-gray-100">
+        {% for item in uncategorized %}
+        {% include "shopping/partials/item_row.html" %}
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+{% endif %}
+
+{% if not categorized_items and not uncategorized and not all_items %}
+<div class="text-center py-12 bg-white rounded-lg shadow-sm">
+    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+    </svg>
+    <h3 class="mt-2 text-sm font-medium text-gray-900">No items yet</h3>
+    <p class="mt-1 text-sm text-gray-500">Add items using the form above.</p>
+</div>
+{% endif %}

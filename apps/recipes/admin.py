@@ -1,9 +1,11 @@
 from django.contrib import admin
 
 from .models import (
-    Category,
+    Cuisine,
+    DishType,
     Ingredient,
     IngredientCategory,
+    Protein,
     Recipe,
     RecipeIngredient,
     Tag,
@@ -32,12 +34,32 @@ class IngredientAdmin(admin.ModelAdmin):
     ordering = ["name"]
 
 
-@admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
-    list_display = ["name", "parent", "recipe_count"]
-    list_filter = ["parent"]
+@admin.register(Cuisine)
+class CuisineAdmin(admin.ModelAdmin):
+    list_display = ["name", "recipe_count"]
     search_fields = ["name"]
-    autocomplete_fields = ["parent"]
+
+    def recipe_count(self, obj):
+        return obj.recipes.count()
+
+    recipe_count.short_description = "Recipes"
+
+
+@admin.register(Protein)
+class ProteinAdmin(admin.ModelAdmin):
+    list_display = ["name", "recipe_count"]
+    search_fields = ["name"]
+
+    def recipe_count(self, obj):
+        return obj.recipes.count()
+
+    recipe_count.short_description = "Recipes"
+
+
+@admin.register(DishType)
+class DishTypeAdmin(admin.ModelAdmin):
+    list_display = ["name", "recipe_count"]
+    search_fields = ["name"]
 
     def recipe_count(self, obj):
         return obj.recipes.count()
@@ -69,16 +91,17 @@ class RecipeIngredientInline(admin.TabularInline):
 class RecipeAdmin(admin.ModelAdmin):
     list_display = [
         "name",
-        "category",
+        "get_cuisines",
+        "get_proteins",
+        "get_dish_types",
         "servings",
         "total_time",
         "makes_leftovers",
         "created_at",
     ]
-    list_filter = ["category", "tags", "makes_leftovers"]
+    list_filter = ["cuisines", "proteins", "dish_types", "tags", "makes_leftovers"]
     search_fields = ["name", "description", "instructions"]
-    autocomplete_fields = ["category"]
-    filter_horizontal = ["tags"]
+    filter_horizontal = ["cuisines", "proteins", "dish_types", "tags"]
     inlines = [RecipeIngredientInline]
     readonly_fields = ["created_at", "updated_at"]
     fieldsets = [
@@ -95,7 +118,7 @@ class RecipeAdmin(admin.ModelAdmin):
             },
         ),
         ("Instructions", {"fields": ["instructions"]}),
-        ("Organization", {"fields": ["category", "tags"]}),
+        ("Classification", {"fields": ["cuisines", "proteins", "dish_types", "tags"]}),
         (
             "Source",
             {
@@ -111,6 +134,21 @@ class RecipeAdmin(admin.ModelAdmin):
             },
         ),
     ]
+
+    def get_cuisines(self, obj):
+        return ", ".join([c.name for c in obj.cuisines.all()])
+
+    get_cuisines.short_description = "Cuisines"
+
+    def get_proteins(self, obj):
+        return ", ".join([p.name for p in obj.proteins.all()])
+
+    get_proteins.short_description = "Proteins"
+
+    def get_dish_types(self, obj):
+        return ", ".join([d.name for d in obj.dish_types.all()])
+
+    get_dish_types.short_description = "Dish Types"
 
 
 @admin.register(RecipeIngredient)

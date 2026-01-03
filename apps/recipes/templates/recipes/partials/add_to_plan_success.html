@@ -1,0 +1,25 @@
+<!-- Add to Meal Plan Success -->
+<div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+    <div class="p-6 text-center">
+        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
+            <svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+        </div>
+        <h3 class="mt-4 text-lg font-semibold text-gray-900">Added to Meal Plan</h3>
+        <p class="mt-2 text-sm text-gray-500">
+            {{ recipe.name }} has been added to {{ meal_type_display }} on {{ date|date:"l, F j" }}.
+        </p>
+        <div class="mt-6 flex items-center justify-center gap-3">
+            <button type="button"
+                    @click="$dispatch('close-modal')"
+                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                Close
+            </button>
+            <a href="{% url 'planning:calendar' %}"
+               class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                View Calendar
+            </a>
+        </div>
+    </div>
+</div>

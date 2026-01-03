@@ -22,11 +22,6 @@ urlpatterns = [
         views.ingredient_create_inline,
         name="ingredient_create_inline",
     ),
-    path(
-        "categories/create-inline/",
-        views.category_create_inline,
-        name="category_create_inline",
-    ),
     path("tags/create-inline/", views.tag_create_inline, name="tag_create_inline"),
     # Recipe ingredient management (HTMX)
     path(
@@ -44,4 +39,20 @@ urlpatterns = [
         views.recipe_ingredient_update,
         name="recipe_ingredient_update",
     ),
+    # Meal planning integration
+    path(
+        "<int:pk>/add-to-plan/modal/",
+        views.add_to_meal_plan_modal,
+        name="add_to_meal_plan_modal",
+    ),
+    path(
+        "<int:pk>/add-to-plan/",
+        views.add_to_meal_plan,
+        name="add_to_meal_plan",
+    ),
+    # Recipe import
+    path("import/", views.recipe_import, name="recipe_import"),
+    path("import/url/", views.recipe_import_from_url, name="recipe_import_from_url"),
+    path("import/text/", views.recipe_import_from_text, name="recipe_import_from_text"),
+    path("import/confirm/", views.recipe_import_confirm, name="recipe_import_confirm"),
 ]

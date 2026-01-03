@@ -1,0 +1,43 @@
+<!-- Recipe Usage -->
+<div class="bg-white rounded-lg shadow-sm p-6">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4">Most Used Recipes</h2>
+
+    {% if top_recipes %}
+    <div class="space-y-4">
+        {% for recipe in top_recipes %}
+        <div>
+            <div class="flex items-center justify-between mb-1">
+                <a href="{% url 'recipes:recipe_detail' recipe.pk %}"
+                   class="text-sm font-medium text-blue-600 hover:text-blue-800">
+                    {{ recipe.name }}
+                </a>
+                <span class="text-sm text-gray-500 ml-2">
+                    {{ recipe.usage_count }}x
+                </span>
+            </div>
+            <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+                {% widthratio recipe.usage_count max_recipe_usage 100 as bar_width %}
+                <div class="h-full bg-blue-500 rounded-full transition-all duration-500"
+                     style="width: {{ bar_width }}%;"></div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-gray-500 text-sm">No recipes have been planned yet.</p>
+    {% endif %}
+
+    {% if never_used_recipes %}
+    <div class="mt-6 pt-4 border-t border-gray-200">
+        <h3 class="text-sm font-medium text-gray-700 mb-2">Never Used Recipes</h3>
+        <div class="flex flex-wrap gap-2">
+            {% for recipe in never_used_recipes %}
+            <a href="{% url 'recipes:recipe_detail' recipe.pk %}"
+               class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 hover:bg-gray-200">
+                {{ recipe.name }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>

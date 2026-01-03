@@ -1,3 +1,4 @@
+{% load unit_tags %}
 <p class="text-sm text-gray-500 mb-3">
     For {{ scaled_servings }} serving{{ scaled_servings|pluralize }}
 </p>
@@ -9,7 +10,7 @@
             {% if item.quantity %}
                 <strong>{{ item.quantity|floatformat:"-2" }}</strong>
             {% endif %}
-            {% if item.unit %}{{ item.unit }}{% endif %}
+            {% if item.unit %}{{ item.unit|pluralize_unit:item.quantity }}{% endif %}
             {{ item.ingredient.name }}
             {% if item.preparation %}
                 <span class="text-gray-500">({{ item.preparation }})</span>

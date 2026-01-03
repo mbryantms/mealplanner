@@ -1,0 +1,331 @@
+<!-- Import Preview Form -->
+<div class="bg-white rounded-lg shadow-sm p-6" x-data="importPreview()">
+    <h2 class="text-xl font-semibold text-gray-900 mb-4">Review Imported Recipe</h2>
+    <p class="text-sm text-gray-500 mb-6">
+        Review and adjust the parsed data before importing. Click on an ingredient to change the match.
+    </p>
+
+    <form method="post" action="{% url 'recipes:recipe_import_confirm' %}" @submit="prepareSubmit" class="space-y-6">
+        {% csrf_token %}
+
+        <!-- Recipe Details -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Recipe Name *</label>
+                <input type="text" name="name" value="{{ recipe_data.name }}" required
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea name="description" rows="2"
+                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">{{ recipe_data.description }}</textarea>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Prep Time (minutes)</label>
+                <input type="number" name="prep_time" value="{{ recipe_data.prep_time|default:'' }}" min="0"
+                       class="w-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Cook Time (minutes)</label>
+                <input type="number" name="cook_time" value="{{ recipe_data.cook_time|default:'' }}" min="0"
+                       class="w-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Servings</label>
+                <input type="number" name="servings" value="{{ recipe_data.servings|default:4 }}" min="1"
+                       class="w-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+        </div>
+
+        <!-- Ingredients Section -->
+        <div>
+            <h3 class="text-lg font-medium text-gray-900 mb-3">Ingredients</h3>
+            <p class="text-sm text-gray-500 mb-3">
+                <span class="inline-flex items-center">
+                    <span class="w-3 h-3 rounded-full bg-green-500 mr-1"></span> Matched to existing
+                </span>
+                <span class="inline-flex items-center ml-4">
+                    <span class="w-3 h-3 rounded-full bg-amber-500 mr-1"></span> Will create new ingredient
+                </span>
+            </p>
+
+            <div id="ingredients-list" class="space-y-3">
+                <template x-for="(ing, index) in ingredients" :key="ing.id">
+                    <div class="p-3 bg-gray-50 rounded-md border border-gray-200">
+
+                        <!-- Original parsed text -->
+                        <div class="text-xs text-gray-500 mb-2 truncate">
+                            Parsed: "<span x-text="ing.raw_text"></span>"
+                        </div>
+
+                        <div class="flex flex-wrap items-start gap-3">
+                            <!-- Status Indicator -->
+                            <div class="flex-shrink-0 pt-5">
+                                <template x-if="!ing.create_name && ing.ingredient_name">
+                                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-100" title="Matched">
+                                        <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </span>
+                                </template>
+                                <template x-if="ing.create_name">
+                                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-100" title="Will create new">
+                                        <svg class="w-4 h-4 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </span>
+                                </template>
+                            </div>
+
+                            <!-- Ingredient Selector (Editable Combobox) -->
+                            <div class="flex-grow min-w-0">
+                                <label class="block text-xs font-medium text-gray-500 mb-1">Ingredient</label>
+                                <div class="relative">
+                                    <!-- Editable input -->
+                                    <input type="text"
+                                           :value="getIngredientDisplayValue(ing)"
+                                           @input="handleIngredientInput(index, $event.target.value)"
+                                           @focus="openDropdown = index"
+                                           @keydown.escape="closeDropdown()"
+                                           @keydown.tab="closeDropdown()"
+                                           placeholder="Type ingredient name..."
+                                           class="w-full min-h-[42px] px-3 py-2 pr-10 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                           :class="ing.create_name ? 'border-amber-300 bg-amber-50' : (ing.ingredient_name ? 'border-green-300 bg-green-50' : 'border-gray-300 bg-white')">
+
+                                    <!-- Dropdown toggle button -->
+                                    <button type="button"
+                                            @click="toggleDropdown(index)"
+                                            class="absolute inset-y-0 right-0 flex items-center px-2 text-gray-400 hover:text-gray-600">
+                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </button>
+
+                                    <!-- Dropdown suggestions -->
+                                    <div x-show="openDropdown === index"
+                                         x-transition
+                                         @click.outside="closeDropdown()"
+                                         class="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-hidden">
+
+                                        <!-- Options list -->
+                                        <ul class="max-h-60 overflow-y-auto">
+                                            <!-- Show "Create new" when typing something not matched -->
+                                            <template x-if="ing.create_name">
+                                                <li>
+                                                    <div class="px-3 py-2 text-sm text-amber-700 bg-amber-50 flex items-center gap-2">
+                                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                                        </svg>
+                                                        <span>Will create: "<span x-text="ing.create_name"></span>"</span>
+                                                    </div>
+                                                </li>
+                                            </template>
+
+                                            <!-- Existing ingredients filtered by current input -->
+                                            <template x-for="ingredient in getFilteredIngredientsForRow(ing)" :key="ingredient.id">
+                                                <li>
+                                                    <button type="button"
+                                                            @click="selectIngredient(index, ingredient.id, ingredient.name)"
+                                                            class="w-full px-3 py-2 text-left text-sm hover:bg-blue-50"
+                                                            :class="ing.ingredient_id === ingredient.id ? 'bg-blue-100 text-blue-800' : ''">
+                                                        <span x-text="ingredient.name"></span>
+                                                    </button>
+                                                </li>
+                                            </template>
+
+                                            <!-- No results message -->
+                                            <template x-if="getFilteredIngredientsForRow(ing).length === 0 && !ing.create_name">
+                                                <li class="px-3 py-2 text-sm text-gray-500 italic">
+                                                    Type to search or create a new ingredient
+                                                </li>
+                                            </template>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Quantity -->
+                            <div class="w-16 flex-shrink-0">
+                                <label class="block text-xs font-medium text-gray-500 mb-1">Qty</label>
+                                <input type="text"
+                                       x-model="ing.quantity"
+                                       placeholder="1"
+                                       class="w-full min-h-[42px] px-2 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
+                            </div>
+
+                            <!-- Unit -->
+                            <div class="w-20 flex-shrink-0">
+                                <label class="block text-xs font-medium text-gray-500 mb-1">Unit</label>
+                                <input type="text"
+                                       x-model="ing.unit"
+                                       placeholder="cup"
+                                       class="w-full min-h-[42px] px-2 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
+                            </div>
+
+                            <!-- Preparation -->
+                            <div class="w-32 flex-shrink-0">
+                                <label class="block text-xs font-medium text-gray-500 mb-1">Prep</label>
+                                <input type="text"
+                                       x-model="ing.preparation"
+                                       placeholder="diced"
+                                       class="w-full min-h-[42px] px-2 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
+                            </div>
+
+                            <!-- Remove button -->
+                            <div class="flex-shrink-0 pt-5">
+                                <button type="button"
+                                        @click="removeIngredient(index)"
+                                        class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded"
+                                        title="Remove ingredient">
+                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <template x-if="ingredients.length === 0">
+                    <p class="text-gray-500 text-sm">No ingredients found. You can add them after importing.</p>
+                </template>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Instructions</label>
+            <textarea name="instructions" rows="10"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">{{ recipe_data.instructions }}</textarea>
+        </div>
+
+        <!-- Hidden fields -->
+        {% if source_url %}
+        <input type="hidden" name="source_url" value="{{ source_url }}">
+        {% endif %}
+        {% if image_url %}
+        <input type="hidden" name="image_url" value="{{ image_url }}">
+        {% endif %}
+        <input type="hidden" name="ingredients_json" id="ingredients-json" x-model="ingredientsJson">
+
+        <!-- Actions -->
+        <div class="flex items-center justify-end gap-3 pt-4 border-t">
+            <a href="{% url 'recipes:recipe_import' %}"
+               class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                Start Over
+            </a>
+            <button type="submit"
+                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                Import Recipe
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+function importPreview() {
+    return {
+        // Dropdown state (single dropdown open at a time)
+        openDropdown: null,
+
+        // All available ingredients for the dropdown
+        allIngredients: [
+            {% for ingredient in all_ingredients %}
+            { id: {{ ingredient.pk }}, name: '{{ ingredient.name|escapejs }}' }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+
+        // Parsed ingredients with their matches
+        ingredients: [
+            {% for match in matched_ingredients %}
+            {
+                id: {{ forloop.counter }},
+                ingredient_id: {{ match.matched_ingredient.pk|default:'null' }},
+                ingredient_name: {% if match.matched_ingredient %}'{{ match.matched_ingredient.name|escapejs }}'{% else %}null{% endif %},
+                create_name: {% if match.needs_creation %}'{{ match.parsed_name|escapejs }}'{% else %}null{% endif %},
+                parsed_name: '{{ match.parsed_name|escapejs }}',
+                raw_text: '{{ match.raw_text|escapejs }}',
+                quantity: '{{ match.parsed_quantity|default:""|escapejs }}',
+                unit: '{{ match.parsed_unit|default:""|escapejs }}',
+                preparation: '{{ match.parsed_preparation|default:""|escapejs }}'
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+
+        // Get the display value for the ingredient input
+        getIngredientDisplayValue(ing) {
+            if (ing.ingredient_name) return ing.ingredient_name;
+            if (ing.create_name) return ing.create_name;
+            return '';
+        },
+
+        // Handle typing in the ingredient input
+        handleIngredientInput(index, value) {
+            const trimmed = value.trim();
+
+            // Check if it exactly matches an existing ingredient
+            const exactMatch = this.allIngredients.find(
+                i => i.name.toLowerCase() === trimmed.toLowerCase()
+            );
+
+            if (exactMatch) {
+                // Found exact match - select it
+                this.ingredients[index].ingredient_id = exactMatch.id;
+                this.ingredients[index].ingredient_name = exactMatch.name;
+                this.ingredients[index].create_name = null;
+            } else {
+                // No match - will create new
+                this.ingredients[index].ingredient_id = null;
+                this.ingredients[index].ingredient_name = null;
+                this.ingredients[index].create_name = trimmed || null;
+            }
+        },
+
+        // Get filtered ingredients for a specific row based on its current value
+        getFilteredIngredientsForRow(ing) {
+            const searchTerm = ing.ingredient_name || ing.create_name || '';
+            if (!searchTerm) return this.allIngredients.slice(0, 20);
+            const query = searchTerm.toLowerCase();
+            return this.allIngredients.filter(i => i.name.toLowerCase().includes(query)).slice(0, 20);
+        },
+
+        toggleDropdown(index) {
+            if (this.openDropdown === index) {
+                this.closeDropdown();
+            } else {
+                this.openDropdown = index;
+            }
+        },
+
+        closeDropdown() {
+            this.openDropdown = null;
+        },
+
+        selectIngredient(index, id, name) {
+            this.ingredients[index].ingredient_id = id;
+            this.ingredients[index].ingredient_name = name;
+            this.ingredients[index].create_name = null;
+            this.closeDropdown();
+        },
+
+        removeIngredient(index) {
+            this.ingredients.splice(index, 1);
+        },
+
+        get ingredientsJson() {
+            return JSON.stringify(this.ingredients);
+        },
+
+        prepareSubmit() {
+            document.getElementById('ingredients-json').value = this.ingredientsJson;
+        }
+    };
+}
+</script>

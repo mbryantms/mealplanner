@@ -16,6 +16,7 @@ services:
       - .:/app
       - /app/.venv
       - /app/node_modules
+      - ./media:/app/media  # Override production volume with bind mount
     environment:
       - DEBUG=true
       - SECRET_KEY=dev-secret-key-not-for-production

@@ -45,30 +45,41 @@ class Ingredient(models.Model):
         return self.name
 
 
-class Category(models.Model):
-    """Hierarchical grouping for recipes (e.g., Cuisine > Italian > Pasta)."""
+class Cuisine(models.Model):
+    """Cuisine type for recipes (e.g., Italian, Mexican, Asian)."""
 
-    name = models.CharField(max_length=100)
-    parent = models.ForeignKey(
-        "self",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="children",
-    )
+    name = models.CharField(max_length=100, unique=True)
 
     class Meta:
-        verbose_name_plural = "Categories"
         ordering = ["name"]
-        constraints = [
-            models.UniqueConstraint(
-                fields=["name", "parent"], name="unique_category_name_per_parent"
-            )
-        ]
 
     def __str__(self):
-        if self.parent:
-            return f"{self.parent} > {self.name}"
+        return self.name
+
+
+class Protein(models.Model):
+    """Protein type for recipes (e.g., Chicken, Beef, Vegetarian)."""
+
+    name = models.CharField(max_length=100, unique=True)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
+
+class DishType(models.Model):
+    """Dish/meal type for recipes (e.g., Breakfast, Dinner, Appetizer, Side)."""
+
+    name = models.CharField(max_length=100, unique=True)
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name = "Dish type"
+        verbose_name_plural = "Dish types"
+
+    def __str__(self):
         return self.name
 
 
@@ -111,10 +122,18 @@ class Recipe(models.Model):
         blank=True, help_text="Original recipe URL (for reference)"
     )
     image = models.ImageField(upload_to="recipes/", blank=True)
-    category = models.ForeignKey(
-        Category,
-        on_delete=models.SET_NULL,
-        null=True,
+    cuisines = models.ManyToManyField(
+        Cuisine,
+        blank=True,
+        related_name="recipes",
+    )
+    proteins = models.ManyToManyField(
+        Protein,
+        blank=True,
+        related_name="recipes",
+    )
+    dish_types = models.ManyToManyField(
+        DishType,
         blank=True,
         related_name="recipes",
     )

@@ -1,0 +1,39 @@
+<div class="p-4 bg-white rounded-lg shadow-lg">
+    <div class="flex items-center gap-3">
+        <div class="flex-shrink-0">
+            <svg class="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+        </div>
+        <div>
+            <p class="text-green-700 font-medium">Ingredient created!</p>
+            <p class="text-sm text-gray-600">
+                <strong>{{ ingredient.name }}</strong>
+                {% if ingredient.default_unit %}({{ ingredient.default_unit }}){% endif %}
+            </p>
+        </div>
+    </div>
+    <p class="mt-3 text-xs text-gray-500">The ingredient has been selected automatically.</p>
+    <button type="button"
+            onclick="document.getElementById('new-ingredient-modal').innerHTML = ''"
+            class="mt-3 w-full px-3 py-2 text-sm text-white bg-green-600 rounded hover:bg-green-700">
+        Done
+    </button>
+</div>
+<script>
+    // Set the hidden ingredient ID field with the new ingredient
+    document.getElementById('ingredient-id').value = '{{ ingredient.pk }}';
+    // Set the hidden unit field with the ingredient's default unit
+    document.getElementById('ingredient-unit').value = '{{ ingredient.default_unit|escapejs }}';
+    // Update the search input with the ingredient name
+    const searchInputs = document.querySelectorAll('input[placeholder="Search ingredients..."]');
+    searchInputs.forEach(input => {
+        if (input.closest('#ingredient-form-wrapper')) {
+            input.value = '{{ ingredient.name }}';
+        }
+    });
+    // Auto-close modal after 2 seconds
+    setTimeout(() => {
+        document.getElementById('new-ingredient-modal').innerHTML = '';
+    }, 2000);
+</script>
