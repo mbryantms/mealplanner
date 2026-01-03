@@ -76,29 +76,73 @@
             </div>
 
             <!-- Classification -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Cuisine</label>
-                    <div class="border border-gray-300 rounded-md p-3 max-h-40 overflow-y-auto">
-                        {{ form.cuisines }}
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Cuisine</label>
+                    <div class="flex flex-wrap gap-2">
+                        {% for checkbox in form.cuisines %}
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="cuisines" value="{{ checkbox.data.value }}"
+                                   {% if checkbox.data.selected %}checked{% endif %}
+                                   class="sr-only peer">
+                            <span class="px-3 py-2 text-sm font-medium rounded-full transition-colors
+                                         peer-checked:bg-amber-600 peer-checked:text-white
+                                         bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300">
+                                {{ checkbox.choice_label }}
+                            </span>
+                        </label>
+                        {% endfor %}
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Protein</label>
-                    <div class="border border-gray-300 rounded-md p-3 max-h-40 overflow-y-auto">
-                        {{ form.proteins }}
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Protein</label>
+                    <div class="flex flex-wrap gap-2">
+                        {% for checkbox in form.proteins %}
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="proteins" value="{{ checkbox.data.value }}"
+                                   {% if checkbox.data.selected %}checked{% endif %}
+                                   class="sr-only peer">
+                            <span class="px-3 py-2 text-sm font-medium rounded-full transition-colors
+                                         peer-checked:bg-rose-600 peer-checked:text-white
+                                         bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300">
+                                {{ checkbox.choice_label }}
+                            </span>
+                        </label>
+                        {% endfor %}
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Dish Type</label>
-                    <div class="border border-gray-300 rounded-md p-3 max-h-40 overflow-y-auto">
-                        {{ form.dish_types }}
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Dish Type</label>
+                    <div class="flex flex-wrap gap-2">
+                        {% for checkbox in form.dish_types %}
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="dish_types" value="{{ checkbox.data.value }}"
+                                   {% if checkbox.data.selected %}checked{% endif %}
+                                   class="sr-only peer">
+                            <span class="px-3 py-2 text-sm font-medium rounded-full transition-colors
+                                         peer-checked:bg-indigo-600 peer-checked:text-white
+                                         bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300">
+                                {{ checkbox.choice_label }}
+                            </span>
+                        </label>
+                        {% endfor %}
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Tags</label>
-                    <div class="border border-gray-300 rounded-md p-3 max-h-40 overflow-y-auto">
-                        {{ form.tags }}
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tags</label>
+                    <div class="flex flex-wrap gap-2">
+                        {% for checkbox in form.tags %}
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="tags" value="{{ checkbox.data.value }}"
+                                   {% if checkbox.data.selected %}checked{% endif %}
+                                   class="sr-only peer">
+                            <span class="px-3 py-2 text-sm font-medium rounded-full transition-colors
+                                         peer-checked:bg-blue-600 peer-checked:text-white
+                                         bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300">
+                                {{ checkbox.choice_label }}
+                            </span>
+                        </label>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
