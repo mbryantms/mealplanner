@@ -81,16 +81,24 @@ def recipe_list(request):
         query_params.append(f"tags={tag_id}")
     filter_query_string = "&".join(query_params)
 
+    # Check if any filters are active
+    has_filters = bool(cuisine_ids or protein_ids or dish_type_ids or tag_ids)
+
     context = {
         "page_obj": page_obj,
         "form": form,
         "search_query": search_query,
         "filter_query_string": filter_query_string,
+        "cuisine_count": len(cuisine_ids),
+        "protein_count": len(protein_ids),
+        "dish_type_count": len(dish_type_ids),
+        "tag_count": len(tag_ids),
+        "has_filters": has_filters,
     }
 
     # Return partial for HTMX requests
     if request.headers.get("HX-Request"):
-        return render(request, "recipes/partials/recipe_list.html", context)
+        return render(request, "recipes/partials/recipe_list_with_filters.html", context)
 
     return render(request, "recipes/recipe_list.html", context)
 
