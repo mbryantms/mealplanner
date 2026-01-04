@@ -17,7 +17,8 @@ def preprocess_lists(text):
     between list items. This function:
     1. Auto-numbers paragraph-style instructions that look like steps
     2. Removes blank lines between list items
-    3. Adds a blank line before the list starts
+    3. Merges continuation lines into their parent list item
+    4. Adds a blank line before the list starts
     """
     lines = text.split("\n")
 
@@ -43,10 +44,11 @@ def preprocess_lists(text):
                 # Add blank line at start for markdown, then join without extra blanks
                 return "\n" + "\n".join(numbered_lines)
 
-    # For text that already has numbers, process to ensure proper formatting
+    # For text that already has numbers, merge continuation lines and format
     result = []
     in_list = False
     prev_was_blank = True
+    current_item = None
 
     for line in lines:
         is_numbered = numbered_pattern.match(line)
@@ -55,6 +57,10 @@ def preprocess_lists(text):
         is_blank = line.strip() == ""
 
         if is_list_item:
+            # Save previous item if exists
+            if current_item is not None:
+                result.append(current_item)
+
             # Add blank line before first list item if needed
             if not in_list and not prev_was_blank:
                 result.append("")
@@ -65,20 +71,35 @@ def preprocess_lists(text):
                 line = numbered_pattern.sub(
                     lambda m: re.sub(r"(\d+)[\.\)\:]", r"\1.", m.group()), line
                 )
-            result.append(line)
+            current_item = line
         elif is_blank:
+            # Blank line - save current item and reset
+            if current_item is not None:
+                result.append(current_item)
+                current_item = None
             # Skip blank lines within a list
             if not in_list:
                 result.append(line)
-            # If in a list, don't add blank line (would break the list)
         else:
-            # Non-list, non-blank line - end any current list
-            if in_list:
-                result.append("")  # Add blank after list ends
-            in_list = False
-            result.append(line)
+            # Non-list, non-blank line
+            if in_list and current_item is not None:
+                # Continuation of previous list item - append to it
+                current_item += " " + line.strip()
+            else:
+                # Regular paragraph - end any current list
+                if current_item is not None:
+                    result.append(current_item)
+                    current_item = None
+                if in_list:
+                    result.append("")  # Add blank after list ends
+                in_list = False
+                result.append(line)
 
         prev_was_blank = is_blank
+
+    # Don't forget the last item
+    if current_item is not None:
+        result.append(current_item)
 
     return "\n".join(result)
 
