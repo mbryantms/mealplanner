@@ -131,4 +131,20 @@ def markdown_format(value):
     )
 
     html = md.convert(value)
+
+    # Add inline styles to lists to override Tailwind reset
+    # This ensures lists display correctly regardless of CSS cascade issues
+    html = html.replace(
+        "<ol>",
+        '<ol style="list-style-type: decimal; padding-left: 1.625em; margin: 1.25em 0;">'
+    )
+    html = html.replace(
+        "<ul>",
+        '<ul style="list-style-type: disc; padding-left: 1.625em; margin: 1.25em 0;">'
+    )
+    html = html.replace(
+        "<li>",
+        '<li style="display: list-item; margin: 0.5em 0;">'
+    )
+
     return mark_safe(html)
