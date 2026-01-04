@@ -34,10 +34,23 @@ class FrameOptionsMiddleware:
         if frame_ancestors:
             # Handle both list and string formats
             if isinstance(frame_ancestors, str):
-                ancestors = frame_ancestors
+                values = [v.strip() for v in frame_ancestors.split(",")]
             else:
-                ancestors = " ".join(frame_ancestors)
+                values = list(frame_ancestors)
 
+            # Normalize CSP keywords - 'self', 'none' must have quotes
+            # Shell/docker often strips quotes, so add them back if needed
+            normalized = []
+            for v in values:
+                v = v.strip()
+                if v in ("self", "'self'"):
+                    normalized.append("'self'")
+                elif v in ("none", "'none'"):
+                    normalized.append("'none'")
+                elif v:
+                    normalized.append(v)
+
+            ancestors = " ".join(normalized)
             response["Content-Security-Policy"] = f"frame-ancestors {ancestors}"
 
             # Remove X-Frame-Options if we're using CSP frame-ancestors
