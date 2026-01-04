@@ -4,25 +4,36 @@
 
 /* ============================================
    Prose List Styles (override Tailwind reset)
-   Using !important to guarantee override of base reset
+   Placed AFTER utilities to ensure highest priority
    ============================================ */
-.prose ol {
+.prose ol,
+.prose-gray ol,
+div.prose ol,
+div.prose-gray ol {
   list-style-type: decimal !important;
+  list-style-position: outside !important;
   padding-left: 1.625em !important;
-  margin-top: 1.25em;
-  margin-bottom: 1.25em;
+  margin-top: 1.25em !important;
+  margin-bottom: 1.25em !important;
 }
 
-.prose ul {
+.prose ul,
+.prose-gray ul,
+div.prose ul,
+div.prose-gray ul {
   list-style-type: disc !important;
+  list-style-position: outside !important;
   padding-left: 1.625em !important;
-  margin-top: 1.25em;
-  margin-bottom: 1.25em;
+  margin-top: 1.25em !important;
+  margin-bottom: 1.25em !important;
 }
 
-.prose li {
-  margin-top: 0.5em;
-  margin-bottom: 0.5em;
+.prose li,
+.prose-gray li,
+div.prose li,
+div.prose-gray li {
+  margin-top: 0.5em !important;
+  margin-bottom: 0.5em !important;
   display: list-item !important;
 }
 
