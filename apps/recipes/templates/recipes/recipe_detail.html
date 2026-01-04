@@ -55,7 +55,7 @@
                         </div>
                         {% endif %}
                     </div>
-                    <div class="flex flex-wrap gap-2 sm:flex-shrink-0">
+                    <div class="flex flex-wrap items-start gap-2 sm:flex-shrink-0">
                         <button type="button"
                                 hx-get="{% url 'recipes:add_to_meal_plan_modal' recipe.pk %}"
                                 hx-target="#add-to-plan-modal"
