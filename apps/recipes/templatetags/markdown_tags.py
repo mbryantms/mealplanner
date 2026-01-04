@@ -13,9 +13,11 @@ def preprocess_lists(text):
     """
     Pre-process text to help markdown recognize lists.
 
-    Markdown requires a blank line before a list. This function:
-    1. Adds blank lines before numbered/bullet lists that don't have them
-    2. Auto-numbers paragraph-style instructions that look like steps
+    Markdown requires a blank line before a list, and NO blank lines
+    between list items. This function:
+    1. Auto-numbers paragraph-style instructions that look like steps
+    2. Removes blank lines between list items
+    3. Adds a blank line before the list starts
     """
     lines = text.split("\n")
 
@@ -30,27 +32,21 @@ def preprocess_lists(text):
     # If no numbers, check if it looks like step-by-step instructions
     # (multiple non-blank lines that could be individual steps)
     if not has_numbers:
-        non_blank_lines = [line for line in lines if line.strip()]
-        # Auto-number if we have 3+ separate lines that look like steps
+        non_blank_lines = [line.strip() for line in lines if line.strip()]
+        # Auto-number if we have 3+ separate paragraphs/lines that look like steps
         if len(non_blank_lines) >= 3:
-            # Check they're not already a paragraph (very long lines)
+            # Check they're not super long (would indicate a single paragraph)
             avg_length = sum(len(line) for line in non_blank_lines) / len(non_blank_lines)
-            if avg_length < 300:  # Likely individual steps, not paragraphs
-                numbered_lines = []
-                step_num = 1
-                for line in lines:
-                    if line.strip():
-                        numbered_lines.append(f"{step_num}. {line.strip()}")
-                        step_num += 1
-                    else:
-                        numbered_lines.append(line)
-                lines = numbered_lines
-                has_numbers = True
+            if avg_length < 500:  # Likely individual steps, not one long paragraph
+                # Create numbered list without blank lines between items
+                numbered_lines = [f"{i}. {line}" for i, line in enumerate(non_blank_lines, 1)]
+                # Add blank line at start for markdown, then join without extra blanks
+                return "\n" + "\n".join(numbered_lines)
 
-    # Now process for markdown list formatting
+    # For text that already has numbers, process to ensure proper formatting
     result = []
-    prev_was_list = False
-    prev_was_blank = True  # Treat start as blank
+    in_list = False
+    prev_was_blank = True
 
     for line in lines:
         is_numbered = numbered_pattern.match(line)
@@ -58,18 +54,30 @@ def preprocess_lists(text):
         is_list_item = is_numbered or is_bullet
         is_blank = line.strip() == ""
 
-        # Add blank line before first list item if needed
-        if is_list_item and not prev_was_list and not prev_was_blank:
-            result.append("")
+        if is_list_item:
+            # Add blank line before first list item if needed
+            if not in_list and not prev_was_blank:
+                result.append("")
+            in_list = True
 
-        # Normalize numbered list format to "1. " style for markdown
-        if is_numbered:
-            line = numbered_pattern.sub(
-                lambda m: re.sub(r"(\d+)[\.\)\:]", r"\1.", m.group()), line
-            )
+            # Normalize numbered list format to "1. " style
+            if is_numbered:
+                line = numbered_pattern.sub(
+                    lambda m: re.sub(r"(\d+)[\.\)\:]", r"\1.", m.group()), line
+                )
+            result.append(line)
+        elif is_blank:
+            # Skip blank lines within a list
+            if not in_list:
+                result.append(line)
+            # If in a list, don't add blank line (would break the list)
+        else:
+            # Non-list, non-blank line - end any current list
+            if in_list:
+                result.append("")  # Add blank after list ends
+            in_list = False
+            result.append(line)
 
-        result.append(line)
-        prev_was_list = is_list_item
         prev_was_blank = is_blank
 
     return "\n".join(result)
