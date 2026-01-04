@@ -11,6 +11,7 @@
   },
   "devDependencies": {
     "tailwindcss": "^3.4",
+    "@tailwindcss/typography": "^0.5",
     "npm-run-all": "^4.1"
   },
   "dependencies": {
