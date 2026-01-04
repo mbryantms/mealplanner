@@ -16,6 +16,7 @@ env = environ.Env(
     DEBUG=(bool, False),
     ALLOWED_HOSTS=(list, []),
     CSRF_TRUSTED_ORIGINS=(list, []),
+    FRAME_ANCESTORS=(list, ["'self'"]),
 )
 
 # Read .env file if it exists
@@ -34,6 +35,10 @@ ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 
 # CSRF settings for production (required when behind reverse proxy)
 CSRF_TRUSTED_ORIGINS = env("CSRF_TRUSTED_ORIGINS")
+
+# Frame ancestors for Content-Security-Policy (allows embedding in iframes)
+# Set FRAME_ANCESTORS='self',https://ha.bryhome.live to allow Home Assistant
+FRAME_ANCESTORS = env("FRAME_ANCESTORS")
 
 # Security settings for production
 if not DEBUG:
@@ -75,6 +80,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "config.middleware.FrameOptionsMiddleware",  # CSP frame-ancestors (after XFrameOptions)
 ]
 
 # Debug toolbar (development only)
