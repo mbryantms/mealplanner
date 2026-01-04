@@ -72,11 +72,21 @@ def scrape_recipe_from_url(url: str) -> dict:
         # Parse with recipe-scrapers in wild mode
         scraper = scrape_html(html, org_url=url, wild_mode=True)
 
+        # Get instructions - prefer list format for proper numbering
+        instructions_list = _safe_call(scraper.instructions_list) or []
+        instructions_text = scraper.instructions() or ""
+
+        # Format instructions with numbers if we have a list
+        if instructions_list and len(instructions_list) > 1:
+            instructions = _format_instructions_list(instructions_list)
+        else:
+            instructions = instructions_text
+
         return {
             "name": scraper.title(),
             "description": _safe_call(scraper.description) or "",
-            "instructions": scraper.instructions() or "",
-            "instructions_list": _safe_call(scraper.instructions_list) or [],
+            "instructions": instructions,
+            "instructions_list": instructions_list,
             "ingredients": scraper.ingredients() or [],
             "prep_time": _safe_call(scraper.prep_time),
             "cook_time": _safe_call(scraper.cook_time),
@@ -115,6 +125,32 @@ def _parse_servings(yields_str: str | None) -> int | None:
 
     match = re.search(r"(\d+)", yields_str)
     return int(match.group(1)) if match else None
+
+
+def _format_instructions_list(instructions: list[str]) -> str:
+    """
+    Format a list of instruction steps into numbered markdown.
+
+    Takes a list like:
+        ["Preheat oven to 400.", "Mix ingredients.", "Bake for 30 min."]
+    Returns:
+        "1. Preheat oven to 400.\n2. Mix ingredients.\n3. Bake for 30 min."
+    """
+    if not instructions:
+        return ""
+
+    numbered = []
+    for i, step in enumerate(instructions, 1):
+        # Clean up the step text
+        step = step.strip()
+        if step:
+            # Remove existing numbering if present (e.g., "1. " or "Step 1:")
+            import re
+
+            step = re.sub(r"^(\d+[\.\)\:]|step\s*\d+[\.\:\)]?)\s*", "", step, flags=re.I)
+            numbered.append(f"{i}. {step}")
+
+    return "\n".join(numbered)
 
 
 def download_recipe_image(image_url: str, recipe: Recipe) -> bool:
