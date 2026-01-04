@@ -8,10 +8,10 @@
     <nav class="mb-6" aria-label="Breadcrumb">
         <ol class="flex flex-wrap items-center text-sm text-gray-500">
             <li><a href="{% url 'recipes:recipe_list' %}" class="hover:text-gray-700">Recipes</a></li>
-            <li><span class="mx-2">/</span></li>
+            <li class="px-2">/</li>
             {% if recipe %}
             <li class="min-w-0"><a href="{% url 'recipes:recipe_detail' recipe.pk %}" class="hover:text-gray-700 truncate max-w-[150px] sm:max-w-none">{{ recipe.name }}</a></li>
-            <li><span class="mx-2">/</span></li>
+            <li class="px-2">/</li>
             <li class="text-gray-900">Edit</li>
             {% else %}
             <li class="text-gray-900">{{ title }}</li>
